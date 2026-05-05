@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Mishu's Yarn Hunt - Juego de la Gatita</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a472a 0%, #0e2a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Quicksand', system-ui, -apple-system, 'Comic Neue', cursive;
+            padding: 20px;
+        }
+
+        /* Contenedor principal estilo "diagrama vivo" */
+        .game-container {
+            background: #fef0cf;
+            border-radius: 60px 60px 80px 80px;
+            padding: 25px 30px 30px 30px;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.4), inset 0 1px 3px rgba(255,255,200,0.8);
+            border: 2px solid #ffdb9f;
+        }
+
+        .canvas-panel {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 25px;
+            background: #f7e5c2;
+            border-radius: 48px;
+            padding: 20px;
+        }
+
+        /* Lienzo del juego */
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 28px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.3), inset 0 0 0 3px rgba(255,245,200,0.7);
+            cursor: pointer;
+            background-color: #9fd3e7;
+        }
+
+        /* Panel derecho: código estilo editor */
+        .code-editor {
+            background: #1e1f2c;
+            border-radius: 28px;
+            width: 360px;
+            padding: 16px 12px;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 12px;
+            color: #e2e4f0;
+            border: 1px solid #4a4d6e;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ffb347;
+        }
+
+        .code-header span {
+            background: #ffb347;
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1e1f2c;
+        }
+
+        .code-header h3 {
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: #ffdd99;
+        }
+
+        pre {
+            background: #0f0f17;
+            padding: 12px;
+            border-radius: 20px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 10.5px;
+            line-height: 1.45;
+            color: #cbd5ff;
+            border: 1px solid #2c2f42;
+        }
+
+        .controls-marker {
+            margin-top: 20px;
+            background: #fae6b3;
+            border-radius: 50px;
+            padding: 10px 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 25px;
+            font-weight: bold;
+            color: #5a3e1b;
+            box-shadow: inset 0 1px 3px #ffeecc, 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .badge {
+            background: #d69e2e;
+            padding: 4px 12px;
+            border-radius: 50px;
+            color: white;
+            font-size: 13px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #b97f2e;
+        }
+
+        @media (max-width: 800px) {
+            .canvas-panel { flex-direction: column; align-items: center; }
+            .code-editor { width: 400px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="canvas-panel">
+        <!-- Canvas principal: "juegoCanvas" 400x400 -->
+        <canvas id="juegoCanvas" width="400" height="400"></canvas>
+
+        <!-- Panel derecho: código del juego + arquitectura -->
+        <div class="code-editor">
+            <div class="code-header">
+                <span>🎮 MISHU'S ARCHITECTURE</span>
+                <h3>🐾 Yarn Hunt Engine</h3>
+            </div>
+            <pre>
+// 📁 juego.js - Mishu's World
+const canvas = document.getElementById("juegoCanvas");
+const ctx = canvas.getContext("2d");
+
+// 1. OBJETOS DEL JUEGO
+let mishu = {
+    x: 180, y: 340, vx: 0, vy: 0,
+    width: 28, height: 28,
+    grounded: false, facingRight: true,
+    jumpPower: -6.2, gravity: 0.45
+};
+
+let yarnBall = { x: 320, y: 300, radius: 10, collected: false };
+let score = 0;
+let lives = 3;
+let gameOver = false;
+let invincibleFrames = 0;
+
+// Plataformas + obstáculos (estilo encantador)
+let platforms = [
+    { x: 20, y: 370, w: 80, h: 14 },    // suelo izquierdo
+    { x: 130, y: 355, w: 70, h: 12 },   // escalón
+    { x: 250, y: 350, w: 60, h: 12 },
+    { x: 340, y: 380, w: 60, h: 14 },
+    { x: 20, y: 310, w: 55, h: 12 },    // plataforma media
+    { x: 290, y: 290, w: 65, h: 12 },   // plataforma alta
+    { x: 150, y: 260, w: 55, h: 12 },   // zona de salto
+];
+let hazards = [  // pequeños cactus/arbustos que dañan
+    { x: 100, y: 358, w: 15, h: 15, active: true },
+    { x: 310, y: 378, w: 15, h: 14, active: true },
+    { x: 270, y: 348, w: 14, h: 13, active: true },
+    { x: 45, y: 308, w: 14, h: 13, active: true },
+];
+
+// Controles (teclado)
+let keys = { ArrowLeft: false, ArrowRight: false, Space: false };
+let jumpRequest = false;
+
+// 🌟 Elementos adicionales: hojas flotantes "GO!"
+let goLeaf = { x: 205, y: 230, w: 22, h: 18, visible: true };
+
+// 🧶 Posición dinámica del ovillo (respawn)
+function respawnYarn() {
+    if(gameOver) return;
+    yarnBall.collected = false;
+    // Aparece en alguna plataforma aleatoria
+    let safePlats = platforms.filter(p => p.y < 380);
+    let rand = safePlats[Math.floor(Math.random() * safePlats.length)];
+    yarnBall.x = rand.x + rand.w/2;
+    yarnBall.y = rand.y - 8;
+    yarnBall.radius = 9;
+}
+            </pre>
+            <div class="controls-marker">
+                <span>🎮 ← → + ↑(espacio)</span>
+                <span class="badge">🐾 Jump = SPACE</span>
+                <span>💖 Vidas: 3</span>
+            </div>
+        </div>
+    </div>
+    <footer>✨ Un dia, una michi llamada Mishu caza ovillos mágicos ✨</footer>
+</div>
+
+<script>
+    (function(){
+        // Obtener canvas
+        const canvas = document.getElementById("juegoCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // ========== DEFINICIÓN COMPLETA DEL JUEGO ==========
+        // coincide con la descripción: gata naranja atigrada, bandana azul, ovillo rosa, plataformas estilo píxel suave
+
+        // ----- plataformas y mundo -----
+        let platforms = [
+            { x: 20, y: 370, w: 80, h: 14 },    // suelo izquierdo
+            { x: 130, y: 355, w: 70, h: 12 },   
+            { x: 250, y: 350, w: 60, h: 12 },
+            { x: 340, y: 380, w: 60, h: 14 },
+            { x: 20, y: 310, w: 55, h: 12 },    
+            { x: 290, y: 290, w: 65, h: 12 },   
+            { x: 150, y: 260, w: 55, h: 12 },   
+        ];
+        
+        let hazards = [
+            { x: 100, y: 358, w: 15, h: 15, active: true },
+            { x: 310, y: 378, w: 15, h: 14, active: true },
+            { x: 270, y: 348, w: 14, h: 13, active: true },
+            { x: 45, y: 308, w: 14, h: 13, active: true },
+        ];
+
+        let goLeaf = { x: 205, y: 232, w: 24, h: 20, visible: true };
+
+        // ----- Mishu (la gata) -----
+        let mishu = {
+            x: 35, y: 340, vx: 0, vy: 0,
+            width: 26, height: 26,
+            grounded: false,
+            facingRight: true,
+            jumpPower: -6.2,
+            gravity: 0.48,
+            maxSpeed: 3.6,
+            friction: 0.92,
+            acceleration: 0.45
+        };
+        
+        let yarnBall = { x: 300, y: 280, radius: 9, collected: false };
+        let score = 0;
+        let lives = 3;
+        let gameOver = false;
+        let invincibleTimer = 0;   // frames sin daño
+        let animationId = null;
+        
+        // controles
+        let keys = { ArrowLeft: false, ArrowRight: false, Space: false };
+        let jumpRequested = false;
+        
+        // Funciones auxiliares
+        
+        function respawnYarn() {
+            if(gameOver) return;
+            yarnBall.collected = false;
+            // elegir plataforma aleatoria (evitar que aparezca dentro de mishu)
+            let safePlats = platforms.filter(p => p.y < 380);
+            if(safePlats.length === 0) safePlats = platforms;
+            let rand = safePlats[Math.floor(Math.random() * safePlats.length)];
+            yarnBall.x = rand.x + rand.w/2;
+            yarnBall.y = rand.y - 8;
+            yarnBall.radius = 9;
+            // asegurar que no choque con Mishu inmediatamente
+            if(Math.abs(mishu.x - yarnBall.x) < 25 && Math.abs(mishu.y - yarnBall.y) < 25) {
+                yarnBall.x = (rand.x + 20) % 380;
+            }
+        }
+        
+        // perder vida
+        function hurtMishu() {
+            if(gameOver) return;
+            if(invincibleTimer > 0) return;
+            lives--;
+            invincibleTimer = 45;  // frames de invencibilidad (~0.75 seg a 60fps)
+            if(lives <= 0) {
+                gameOver = true;
+                lives = 0;
+            } else {
+                // Reaparecer en un punto seguro
+                mishu.x = 35;
+                mishu.y = 340;
+                mishu.vx = 0;
+                mishu.vy = 0;
+                mishu.grounded = true;
+                // también reubicar ovillo para no perder oportunidad
+                if(!yarnBall.collected) respawnYarn();
+            }
+        }
+        
+        // actualizar físicas y colisiones
+        function updateMovement() {
+            if(gameOver) return;
+            
+            // controles
+            if(keys.ArrowLeft) {
+                mishu.vx = Math.max(-mishu.maxSpeed, mishu.vx - mishu.acceleration);
+                mishu.facingRight = false;
+            }
+            if(keys.ArrowRight) {
+                mishu.vx = Math.min(mishu.maxSpeed, mishu.vx + mishu.acceleration);
+                mishu.facingRight = true;
+            }
+            // fricción en suelo
+            if(mishu.grounded) {
+                mishu.vx *= mishu.friction;
+            }
+            // gravedad
+            mishu.vy += mishu.gravity;
+            mishu.x += mishu.vx;
+            mishu.y += mishu.vy;
+            
+            // límites horizontales del canvas
+            if(mishu.x < 5) mishu.x = 5;
+            if(mishu.x + mishu.width > canvas.width - 5) mishu.x = canvas.width - mishu.width - 5;
+            
+            // COLISIONES CON PLATAFORMAS (suelos)
+            mishu.grounded = false;
+            for(let plat of platforms) {
+                // colisión desde arriba
+                if(mishu.vy >= 0 && 
+                   mishu.x + mishu.width > plat.x && 
+                   mishu.x < plat.x + plat.w &&
+                   mishu.y + mishu.height <= plat.y + plat.h + 8 &&
+                   mishu.y + mishu.height + mishu.vy >= plat.y) {
+                       mishu.y = plat.y - mishu.height;
+                       mishu.vy = 0;
+                       mishu.grounded = true;
+                }
+                // colisión lateral (opcional, evitar traspasar)
+                else if (mishu.x + mishu.width > plat.x && mishu.x < plat.x + plat.w &&
+                         mishu.y + mishu.height > plat.y && mishu.y < plat.y + plat.h) {
+                    // resolvemos solapamiento lateral suave
+                    let overlapLeft = (mishu.x + mishu.width) - plat.x;
+                    let overlapRight = (plat.x + plat.w) - mishu.x;
+                    if(overlapLeft < overlapRight && overlapLeft > 0) {
+                        mishu.x = plat.x - mishu.width;
+                    } else if(overlapRight <= overlapLeft && overlapRight > 0) {
+                        mishu.x = plat.x + plat.w;
+                    }
+                }
+            }
+            
+            // caída del mapa -> perder vida
+            if(mishu.y + mishu.height > canvas.height + 10) {
+                hurtMishu();
+                mishu.x = 40;
+                mishu.y = 340;
+                mishu.vx = 0;
+                mishu.vy = 0;
+            }
+            if(mishu.y < -20) mishu.y = -18;
+            
+            // Salto (señal)
+            if(jumpRequested && mishu.grounded && !gameOver) {
+                mishu.vy = mishu.jumpPower;
+                mishu.grounded = false;
+                jumpRequested = false;
+            }
+            jumpRequested = false;
+            
+            // Colisión con peligros (cactus / arbustos)
+            for(let h of hazards) {
+                if(!h.active) continue;
+                if(mishu.x + mishu.width > h.x && mishu.x < h.x + h.w &&
+                   mishu.y + mishu.height > h.y && mishu.y < h.y + h.h) {
+                    hurtMishu();
+                    // pequeña retroalecion
+                    mishu.vx = mishu.facingRight ? -2.2 : 2.2;
+                    mishu.vy = -3;
+                    break;
+                }
+            }
+            
+            // invencibilidad decae
+            if(invincibleTimer > 0) invincibleTimer--;
+        }
+        
+        function updateYarn() {
+            if(gameOver) return;
+            if(!yarnBall.collected) {
+                // colisión de Mishu con el ovillo
+                let catLeft = mishu.x, catRight = mishu.x + mishu.width;
+                let catTop = mishu.y, catBottom = mishu.y + mishu.height;
+                let yarnLeft = yarnBall.x - yarnBall.radius;
+                let yarnRight = yarnBall.x + yarnBall.radius;
+                let yarnTop = yarnBall.y - yarnBall.radius;
+                let yarnBottom = yarnBall.y + yarnBall.radius;
+                if(catRight > yarnLeft && catLeft < yarnRight && catBottom > yarnTop && catTop < yarnBottom) {
+                    yarnBall.collected = true;
+                    score++;
+                    // reproducir "miau" sutil imaginario o solo efecto: reagarrar
+                    respawnYarn();
+                    // Si juntamos 5 ovillos de más, bonus extra (opcional)
+                    if(score % 8 === 0 && lives < 5 && !gameOver) {
+                        lives = Math.min(lives+1, 5);
+                    }
+                }
+            }
+        }
+        
+        // ========== DIBUJO ILUSTRATIVO Y WHIMSICAL ==========
+        function drawBackground() {
+            // cielo suave degradado
+            let grad = ctx.createLinearGradient(0, 0, 0, 300);
+            grad.addColorStop(0, "#b8def5");
+            grad.addColorStop(1, "#e4f0fa");
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // nubes fluffy
+            ctx.fillStyle = "#fff9ea";
+            ctx.shadowBlur = 0;
+            drawCloud(45, 45, 28);
+            drawCloud(290, 70, 36);
+            drawCloud(180, 110, 30);
+            drawCloud(340, 25, 24);
+            // caminito sinuoso
+            ctx.beginPath();
+            ctx.strokeStyle = "#dbb46a";
+            ctx.lineWidth = 12;
+            for(let i=0;i<8;i++) {
+                ctx.beginPath();
+                ctx.arc(70 + i*45, 388, 12, 0, Math.PI*2);
+                ctx.fillStyle = "#e7c48b";
+                ctx.fill();
+            }
+            ctx.fillStyle = "#906c3a";
+            for(let i=0;i<5;i++) {
+                ctx.fillRect(35 + i*75, 379, 10, 8);
+            }
+            ctx.fillStyle = "#5c8747";
+            // árboles lejanos
+            ctx.fillRect(15, 150, 16, 55);
+            ctx.fillStyle = "#43732e";
+            ctx.beginPath();
+            ctx.ellipse(23, 145, 15, 22, 0, 0, Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = "#3b6628";
+            ctx.fillRect(353, 130, 14, 68);
+            ctx.beginPath();
+            ctx.ellipse(360, 125, 18, 25, 0, 0, Math.PI*2);
+            ctx.fill();
+        }
+        
+        function drawCloud(x, y, size){
+            ctx.fillStyle = "rgba(255,250,210,0.85)";
+            ctx.beginPath();
+            ctx.ellipse(x, y, size, size*0.7, 0, 0, Math.PI*2);
+            ctx.ellipse(x+size*0.7, y-size*0.2, size*0.8, size*0.65, 0, 0, Math.PI*2);
+            ctx.ellipse(x-size*0.6, y-size*0.15, size*0.75, size*0.6, 0, 0, Math.PI*2);
+            ctx.fill();
+        }
+        
+        function drawPlatforms() {
+            for(let p of platforms) {
+                // madera texturizada
+                ctx.fillStyle = "#ac8e5a";
+                ctx.shadowBlur = 2;
+                ctx.shadowColor = "#5d3a1a";
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+                ctx.fillStyle = "#dbb471";
+                ctx.fillRect(p.x+3, p.y-2, p.w-6, 4);
+                ctx.fillStyle = "#7c5d34";
+                for(let i=0;i<3;i++) ctx.fillRect(p.x+5+i*12, p.y+3, 4, p.h-5);
+                ctx.fillStyle = "#efc48c";
+                ctx.fillRect(p.x+2, p.y+p.h-2, p.w-4, 3);
+            }
+        }
+        
+        function drawHazards() {
+            for(let h of hazards) {
+                ctx.fillStyle = "#6f4f2e";
+                ctx.beginPath();
+                ctx.ellipse(h.x+h.w/2, h.y+h.h-3, 6, 4, 0, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = "#6a9c3e";
+                ctx.fillRect(h.x+2, h.y, 6, 12);
+                ctx.fillRect(h.x+h.w-8, h.y, 6, 12);
+                ctx.fillStyle = "#48822a";
+                ctx.beginPath();
+                ctx.moveTo(h.x+3, h.y); ctx.lineTo(h.x+7, h.y-6); ctx.lineTo(h.x+11, h.y);
+                ctx.fill();
+            }
+        }
+        
+        function drawMishu() {
+            let x = mishu.x, y = mishu.y;
+            // efecto invencible (parpadeo)
+            if(invincibleTimer > 0 && (Math.floor(Date.now()/50)%3 === 0)) {
+                ctx.globalAlpha = 0.65;
+            }
+            // cuerpo naranja atigrado
+            ctx.fillStyle = "#e8832e";
+            ctx.beginPath();
+            ctx.ellipse(x+mishu.width/2, y+mishu.height/2-2, mishu.width/2, mishu.height/2.3, 0, 0, Math.PI*2);
+            ctx.fill();
+            // rayas atigradas
+            ctx.fillStyle = "#bd5710";
+            for(let i=0;i<3;i++) {
+                ctx.fillRect(x+5+i*6, y+12, 3, 8);
+            }
+            // cabeza redonda + orejas
+            ctx.fillStyle = "#f49b42";
+            ctx.beginPath();
+            ctx.ellipse(x+mishu.width/2, y-2, 13, 14, 0, 0, Math.PI*2);
+            ctx.fill();
+            // orejas
+            ctx.fillStyle = "#d9772c";
+            ctx.beginPath(); ctx.moveTo(x+4, y-8); ctx.lineTo(x+12, y-16); ctx.lineTo(x+16, y-10); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(x+mishu.width-4, y-8); ctx.lineTo(x+mishu.width-12, y-16); ctx.lineTo(x+mishu.width-16, y-10); ctx.fill();
+            // Ojos grandes verdes
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath(); ctx.arc(x+9, y-3, 4, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x+mishu.width-9, y-3, 4, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#2d6b2f";
+            ctx.beginPath(); ctx.arc(x+8, y-3, 2, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x+mishu.width-10, y-3, 2, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "black";
+            ctx.beginPath(); ctx.arc(x+7.5, y-4, 1, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x+mishu.width-10.5, y-4, 1, 0, Math.PI*2); ctx.fill();
+            // bigotes
+            ctx.beginPath(); ctx.moveTo(x+4, y); ctx.lineTo(x-4, y+1); ctx.moveTo(x+2, y+3); ctx.lineTo(x-5, y+4);
+            ctx.moveTo(x+mishu.width-4, y); ctx.lineTo(x+mishu.width+4, y+1); ctx.moveTo(x+mishu.width-2, y+3); ctx.lineTo(x+mishu.width+5, y+4);
+            ctx.strokeStyle = "#4e3020"; ctx.lineWidth = 1; ctx.stroke();
+            // Bandana azul
+            ctx.fillStyle = "#5d9bdb";
+            ctx.beginPath(); ctx.moveTo(x+6, y+4); ctx.lineTo(x+mishu.width/2, y+10); ctx.lineTo(x+mishu.width-6, y+4); ctx.fill();
+            ctx.fillStyle = "#2f66b0"; ctx.fillRect(x+10, y+5, 6, 5);
+            
+            // cola rizada
+            ctx.beginPath(); 
+            ctx.moveTo(x+mishu.width-3, y+mishu.height-14);
+            ctx.quadraticCurveTo(x+mishu.width+8, y+mishu.height-22, x+mishu.width+2, y+mishu.height-8);
+            ctx.lineWidth = 6; ctx.strokeStyle = "#e8832e"; ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+        
+        function drawYarn() {
+            if(!yarnBall.collected) {
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = "#ff99bb";
+                ctx.fillStyle = "#ffb7c5";
+                ctx.beginPath(); ctx.arc(yarnBall.x, yarnBall.y, yarnBall.radius, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#f06a8f";
+                for(let i=0;i<3;i++) {
+                    ctx.beginPath(); ctx.ellipse(yarnBall.x-2+i*2, yarnBall.y-2, 3, 2.5, 0.5, 0, Math.PI*2); ctx.fill();
+                }
+                ctx.fillStyle = "#e1486b";
+                ctx.beginPath(); ctx.arc(yarnBall.x+2, yarnBall.y-1, 2, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+        
+        function drawLeafGo() {
+            if(goLeaf.visible) {
+                ctx.fillStyle = "#97d862";
+                ctx.beginPath(); ctx.ellipse(goLeaf.x+12, goLeaf.y+8, 12, 8, -0.2, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#6aaa2a";
+                ctx.fillRect(goLeaf.x+18, goLeaf.y+4, 6, 12);
+                ctx.fillStyle = "#ffffffcc";
+                ctx.font = "bold 16px 'Quicksand'";
+                ctx.shadowBlur = 2;
+                ctx.fillText("GO!", goLeaf.x+4, goLeaf.y+15);
+                ctx.shadowBlur = 0;
+            }
+        }
+        
+        function drawUI() {
+            ctx.font = "bold 18px 'Segoe UI', system-ui";
+            ctx.fillStyle = "#34321c";
+            ctx.fillText(`✨ Puntaje: ${score}`, 12, 35);
+            for(let i=0;i<lives;i++) {
+                ctx.fillStyle = "#f28b82";
+                ctx.beginPath(); ctx.moveTo(68+i*27, 48); ctx.lineTo(73+i*27, 58); ctx.lineTo(63+i*27, 58); ctx.fill();
+                ctx.fillStyle = "#886644";
+                ctx.font = "12px monospace";
+            }
+            ctx.fillStyle = "#5f4c2b";
+            ctx.fillText("🐾 Vidas: "+lives+"/3", 12, 68);
+            if(gameOver) {
+                ctx.font = "bold 26 system-ui";
+                ctx.fillStyle = "#a12522";
+                ctx.shadowBlur = 4;
+                ctx.fillText("💔 GAME OVER", 100, 190);
+                ctx.font = "12px monospace";
+                ctx.fillStyle = "#402e1a";
+                ctx.fillText("Presiona R para reiniciar", 135, 250);
+            }
+        }
+
+        function reiniciarJuego() {
+            gameOver = false;
+            score = 0;
+            lives = 3;
+            invincibleTimer = 0;
+            mishu.x = 35; mishu.y = 340; mishu.vx = 0; mishu.vy = 0;
+            mishu.grounded = true;
+            respawnYarn();
+            yarnBall.collected = false;
+            goLeaf.visible = true;
+        }
+        
+        // bucle de dibujo principal
+        function draw() {
+            if(!gameOver) {
+                updateMovement();
+                updateYarn();
+            }
+            drawBackground();
+            drawPlatforms();
+            drawHazards();
+            drawYarn();
+            drawMishu();
+            drawLeafGo();
+            drawUI();
+            if(gameOver) {
+                // esperar reinicio
+            }
+            requestAnimationFrame(draw);
+        }
+        
+        // Eventos teclado + botón R reinicio
+        window.addEventListener("keydown", (e) => {
+            if(e.key === "ArrowLeft") keys.ArrowLeft = true;
+            if(e.key === "ArrowRight") keys.ArrowRight = true;
+            if(e.key === " " || e.key === "Space" || e.key === "ArrowUp") {
+                e.preventDefault();
+                if(!gameOver) jumpRequested = true;
+            }
+            if(e.key === "r" || e.key === "R") {
+                reiniciarJuego();
+            }
+        });
+        window.addEventListener("keyup", (e) => {
+            if(e.key === "ArrowLeft") keys.ArrowLeft = false;
+            if(e.key === "ArrowRight") keys.ArrowRight = false;
+            if(e.key === " " || e.key === "Space") jumpRequested = false;
+        });
+        // arrancar
+        respawnYarn();
+        draw();
+    })();
+</script>
+</body>
+</html>
