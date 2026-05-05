@@ -52,27 +52,6 @@ El juego nació como un proyecto personal de creatividad y fue evolucionando has
 
 ---
 
-## 🚀 Cómo ejecutar
-
-No requiere instalación ni servidor. Simplemente:
-
-```bash
-# Clonar el repositorio
-git clone https://github.com/tu-usuario/maat-astronauta.git
-
-# Abrir el archivo en el navegador
-cd maat-astronauta
-open Maat_Astronauta.html   # macOS
-start Maat_Astronauta.html  # Windows
-xdg-open Maat_Astronauta.html  # Linux
-```
-
-O bien, descargar el archivo `Maat_Astronauta.html` directamente y abrirlo con cualquier navegador moderno.
-
-> **Nota:** Chrome, Firefox, Edge y Safari son totalmente compatibles. Se recomienda Chrome para mejor rendimiento del Web Audio API.
-
----
-
 ## 🌌 Niveles
 
 | # | Nombre | Ovillos | Velocidad enemigos | Ambiente |
@@ -112,6 +91,10 @@ maat-astronauta/
 Este juego fue creado con cariño como homenaje a **Maat**, una gata atigrada real. La imagen de referencia del personaje (`Maat_Astronauta.png`) inspiró el diseño visual del sprite: pelaje atigrado gris/marrón, ojos amarillo-verdes característicos y actitud exploradora.
 
 El proyecto evolucionó desde una versión original más simple hasta esta versión con temática espacial completa.
+
+---
+👤 Autor
+Juan Manuel Orellana
 
 ---
 
