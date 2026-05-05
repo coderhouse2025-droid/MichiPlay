@@ -36,7 +36,7 @@
     top: 0; left: 0;
   }
 
-  /* ── HUD ── */
+  /* HUD */
   #hud {
     position: absolute; top: 0; left: 0; right: 0;
     padding: 14px 18px;
@@ -48,36 +48,23 @@
     border: 1px solid rgba(34,211,238,0.3);
     border-radius: 50px;
     padding: 7px 18px;
-    display: flex; align-items: center; gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(34,211,238,0.1), inset 0 1px 0 rgba(255,255,255,0.08);
+    box-shadow: 0 0 20px rgba(34,211,238,0.1);
   }
-  .hud-score {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(14px, 2.5vw, 20px);
-    color: var(--star-gold);
-    letter-spacing: 2px;
-    text-shadow: 0 0 12px rgba(255,233,122,0.6);
-  }
-  .hud-level {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(11px, 1.8vw, 15px);
-    color: var(--accent-cyan);
-    letter-spacing: 3px;
-    text-shadow: 0 0 10px rgba(34,211,238,0.5);
-  }
-  .hud-lives {
-    font-size: clamp(14px, 2.5vw, 20px);
-    letter-spacing: 3px;
-  }
+  .hud-score { font-family: 'Orbitron', monospace; font-size: clamp(14px,2.5vw,20px); color: var(--star-gold); letter-spacing: 2px; }
+  .hud-level { font-family: 'Orbitron', monospace; font-size: clamp(11px,1.8vw,15px); color: var(--accent-cyan); letter-spacing: 3px; }
+  .hud-lives { font-size: clamp(14px,2.5vw,20px); letter-spacing: 3px; }
 
-  /* ── BOTÓN EXIT ROJO ── */
+  /* Botón EXIT rojo (siempre visible durante el juego) */
   #exitBtn {
     position: absolute;
     top: 14px;
     right: 80px;
-    width: 44px;
-    height: 44px;
+    width: 50px;
+    height: 50px;
     background: #dc2626;
     border: 2px solid rgba(255,255,200,0.8);
     border-radius: 50%;
@@ -86,7 +73,7 @@
     font-size: 13px;
     color: white;
     text-align: center;
-    line-height: 40px;
+    line-height: 46px;
     cursor: pointer;
     z-index: 25;
     backdrop-filter: blur(4px);
@@ -94,14 +81,23 @@
     transition: transform 0.2s, box-shadow 0.2s;
     pointer-events: all;
   }
-  #exitBtn:hover {
-    transform: scale(1.08);
-    background: #ef4444;
-    box-shadow: 0 0 20px rgba(220,38,38,0.9);
-  }
+  #exitBtn:hover { transform: scale(1.08); background: #ef4444; box-shadow: 0 0 20px rgba(220,38,38,0.9); }
   #exitBtn:active { transform: scale(0.94); }
 
-  /* ── OVERLAY ── */
+  /* Botón música */
+  #musicBtn {
+    position: absolute; top: 14px; right: 18px;
+    z-index: 25; pointer-events: all;
+    background: rgba(2,8,24,0.7);
+    border: 1px solid rgba(34,211,238,0.3);
+    border-radius: 50%;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer;
+    backdrop-filter: blur(8px);
+  }
+
+  /* Overlay principal (inicio / fin) */
   #overlay {
     position: absolute; inset: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -118,78 +114,52 @@
     border-radius: 28px;
     padding: clamp(28px,5vw,52px) clamp(32px,6vw,64px);
     text-align: center;
-    box-shadow: 0 0 80px rgba(34,211,238,0.08), 0 40px 80px rgba(0,0,0,0.7);
+    box-shadow: 0 0 80px rgba(34,211,238,0.08);
     max-width: min(520px, 92vw);
-    position: relative;
-    overflow: hidden;
   }
-  .overlay-card::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.15) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .overlay-icon { font-size: clamp(52px,10vw,80px); margin-bottom: 8px; animation: floatIcon 3s ease-in-out infinite; }
+  .overlay-icon { font-size: clamp(52px,10vw,80px); margin-bottom: 8px; animation: floatIcon 3s infinite; }
   @keyframes floatIcon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-
   .overlay-title {
     font-family: 'Orbitron', monospace;
     font-size: clamp(22px,5vw,42px);
     font-weight: 900;
     color: #fff;
     letter-spacing: 3px;
-    text-shadow: 0 0 30px rgba(34,211,238,0.5), 0 0 60px rgba(124,58,237,0.3);
-    margin-bottom: 6px;
+    text-shadow: 0 0 30px rgba(34,211,238,0.5);
   }
   .overlay-sub {
     font-size: clamp(12px,2vw,15px);
     color: rgba(200,216,240,0.65);
-    margin-bottom: 28px;
-    line-height: 1.7;
-    letter-spacing: 0.5px;
+    margin: 20px 0 28px;
   }
   .overlay-score-big {
     font-family: 'Orbitron', monospace;
     font-size: clamp(16px,3vw,24px);
     color: var(--accent-cyan);
     margin-bottom: 24px;
-    text-shadow: 0 0 15px rgba(34,211,238,0.5);
   }
-
   .btn-launch {
     font-family: 'Orbitron', monospace;
     font-size: clamp(14px,2.5vw,18px);
     font-weight: 700;
-    letter-spacing: 2px;
     padding: 14px 44px;
     border-radius: 50px;
     border: none;
     cursor: pointer;
     background: linear-gradient(135deg, #22d3ee, #7c3aed);
     color: #fff;
-    box-shadow: 0 8px 30px rgba(34,211,238,0.35), 0 0 0 1px rgba(255,255,255,0.1);
+    box-shadow: 0 8px 30px rgba(34,211,238,0.35);
     transition: transform 0.15s, box-shadow 0.15s;
-    pointer-events: all;
-    position: relative;
-    overflow: hidden;
   }
-  .btn-launch::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
-  }
-  .btn-launch:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 14px 40px rgba(34,211,238,0.5); }
-  .btn-launch:active { transform: scale(0.96); }
+  .btn-launch:hover { transform: translateY(-3px) scale(1.05); }
 
-  /* ── CONTROLES TÁCTILES ── */
+  /* Controles táctiles */
   #touchControls {
     position: absolute; bottom: 0; left: 0; right: 0;
     height: 170px; z-index: 10;
     pointer-events: none; display: none;
   }
   #touchControls.active { display: flex; pointer-events: all; }
-
   .t-dpad { position: absolute; bottom: 22px; left: 18px; display: flex; gap: 10px; }
   .t-btn {
     width: 66px; height: 66px;
@@ -199,20 +169,14 @@
     backdrop-filter: blur(6px);
     display: flex; align-items: center; justify-content: center;
     font-size: 24px; color: rgba(34,211,238,0.9);
-    cursor: pointer; transition: background 0.1s, transform 0.1s;
-    pointer-events: all;
+    cursor: pointer;
   }
-  .t-btn.pressed, .t-btn:active { background: rgba(34,211,238,0.28); transform: scale(0.92); }
   .t-jump {
     position: absolute; bottom: 22px; right: 18px;
     width: 82px; height: 82px; border-radius: 50%;
     background: rgba(124,58,237,0.18);
     border: 1.5px solid rgba(124,58,237,0.5);
-    font-size: 28px; display: flex; align-items: center; justify-content: center;
-    color: rgba(167,139,250,0.9);
   }
-
-  /* ── FLOAT TEXT ── */
   .float-text {
     position: absolute;
     font-family: 'Orbitron', monospace;
@@ -224,40 +188,11 @@
     white-space: nowrap;
   }
   @keyframes floatUp {
-    0%{opacity:1;transform:translateY(0) scale(1)}
+    0%{opacity:1;transform:translateY(0)}
     100%{opacity:0;transform:translateY(-70px) scale(1.25)}
   }
-
-  /* ── SHAKE ── */
-  @keyframes hudShake {
-    0%,100%{transform:translateX(0)}
-    20%{transform:translateX(-7px)}
-    40%{transform:translateX(7px)}
-    60%{transform:translateX(-4px)}
-    80%{transform:translateX(4px)}
-  }
   .hud-shake { animation: hudShake 0.38s ease; }
-
-  /* ── MUSIC TOGGLE ── */
-  #musicBtn {
-    position: absolute; top: 14px; right: 18px;
-    z-index: 25; pointer-events: all;
-    background: rgba(2,8,24,0.7);
-    border: 1px solid rgba(34,211,238,0.3);
-    border-radius: 50%;
-    width: 42px; height: 42px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; cursor: pointer;
-    backdrop-filter: blur(8px);
-    transition: transform 0.2s, background 0.2s;
-  }
-  #musicBtn:hover { transform: scale(1.15); background: rgba(34,211,238,0.15); }
-
-  /* scanline effect */
-  body::after {
-    content:''; position:fixed; inset:0; pointer-events:none; z-index:99;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
-  }
+  @keyframes hudShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 40%{transform:translateX(7px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
 </style>
 </head>
 <body>
@@ -265,466 +200,477 @@
 <canvas id="gameCanvas"></canvas>
 
 <div id="hud">
-  <div class="hud-pill">
-    <span style="font-size:18px">🧶</span>
-    <span class="hud-score" id="scoreDisplay">000</span>
-  </div>
+  <div class="hud-pill"><span>🧶</span><span class="hud-score" id="scoreDisplay">000</span></div>
   <div class="hud-pill hud-level" id="levelDisplay">ÓRBITA 1</div>
-  <div class="hud-pill">
-    <span class="hud-lives" id="livesDisplay">🐾🐾🐾</span>
-  </div>
+  <div class="hud-pill"><span class="hud-lives" id="livesDisplay">🐾🐾🐾</span></div>
 </div>
 
-<!-- Botón Exit rojo redondo -->
+<!-- Botón Exit rojo, visible durante el juego -->
 <div id="exitBtn" onclick="exitGame()">EXIT</div>
-<button id="musicBtn" title="Música espacial" onclick="toggleMusic()">🎵</button>
+<button id="musicBtn" onclick="toggleMusic()">🎵</button>
 
 <div id="overlay">
   <div class="overlay-card">
     <div class="overlay-icon">🐱🚀</div>
-    <div class="overlay-title" id="overlayTitle">MAAT ASTRONAUTA</div>
-    <div class="overlay-sub" id="overlaySub">
-      La intrépida gata Maat surca el espacio buscando<br>
-      ovillos cósmicos por la Luna y más allá.<br><br>
-      <span style="color:rgba(34,211,238,0.7)">← → Mover &nbsp;·&nbsp; ↑ / Espacio Saltar</span>
+    <div class="overlay-title">MAAT ASTRONAUTA</div>
+    <div class="overlay-sub">
+      La intrépida gata Maat surca el espacio buscando ovillos cósmicos.<br>
+      ← → mover &nbsp;&nbsp; ↑ / espacio saltar
     </div>
-    <div class="overlay-score-big" id="overlayScore" style="display:none"></div>
     <button class="btn-launch" onclick="startGame()">🚀 LANZAR MISIÓN</button>
   </div>
 </div>
 
 <div id="touchControls">
-  <div class="t-dpad">
-    <div class="t-btn" id="btnLeft">◀</div>
-    <div class="t-btn" id="btnRight">▶</div>
-  </div>
+  <div class="t-dpad"><div class="t-btn" id="btnLeft">◀</div><div class="t-btn" id="btnRight">▶</div></div>
   <div class="t-btn t-jump" id="btnJump">↑</div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-//  MAAT ASTRONAUTA — SPACE EDITION (con bandera ARG y miau)
-// ═══════════════════════════════════════════════════════════
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+  // --------------------------------------------------------------
+  //  MAAT ASTRONAUTA - JUEGO COMPLETO
+  // --------------------------------------------------------------
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, S;
 
-let W, H, S; // S = scale factor
+  // Audio
+  let audioCtx = null;
+  let musicOn = false;
+  let musicNodes = {};
 
-// ── AUDIO ENGINE (con sonido MIAU especial) ─────────────────
-let audioCtx = null, musicOn = false, musicNodes = {};
-
-function initAudio() {
-  if (audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
-
-function playMeowSound() {
-  if (!audioCtx) return;
-  const now = audioCtx.currentTime;
-  const osc1 = audioCtx.createOscillator();
-  const osc2 = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  const filter = audioCtx.createBiquadFilter();
-  
-  osc1.type = 'sine';
-  osc2.type = 'triangle';
-  filter.type = 'lowpass';
-  filter.frequency.value = 1500;
-  gain.gain.value = 0.2;
-  
-  osc1.connect(filter);
-  osc2.connect(filter);
-  filter.connect(gain);
-  gain.connect(audioCtx.destination);
-  
-  // Miau: barrido descendente rápido y leve vibrato
-  osc1.frequency.setValueAtTime(950, now);
-  osc1.frequency.exponentialRampToValueAtTime(450, now + 0.25);
-  osc2.frequency.setValueAtTime(820, now);
-  osc2.frequency.exponentialRampToValueAtTime(400, now + 0.22);
-  
-  gain.gain.setValueAtTime(0.2, now);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
-  
-  osc1.start();
-  osc2.start();
-  osc1.stop(now + 0.45);
-  osc2.stop(now + 0.45);
-}
-
-function playSFX(type) {
-  if (!audioCtx) return;
-  const ctx2 = audioCtx;
-  if (type === 'meow') {
-    playMeowSound();
-    return;
-  }
-  if (type === 'collect') { // legacy, ahora usamos meow
-    playMeowSound();
-    return;
-  } else if (type === 'hurt') {
-    const o = ctx2.createOscillator(), g = ctx2.createGain();
-    o.type = 'sawtooth'; o.frequency.value = 220;
-    o.frequency.setTargetAtTime(55, ctx2.currentTime, 0.15);
-    g.gain.value = 0.15; g.gain.setTargetAtTime(0, ctx2.currentTime + 0.1, 0.1);
-    o.connect(g); g.connect(ctx2.destination);
-    o.start(); o.stop(ctx2.currentTime + 0.4);
-  } else if (type === 'jump') {
-    const o = ctx2.createOscillator(), g = ctx2.createGain();
-    o.type = 'sine'; o.frequency.value = 330;
-    o.frequency.setTargetAtTime(660, ctx2.currentTime, 0.08);
-    g.gain.value = 0.07; g.gain.setTargetAtTime(0, ctx2.currentTime + 0.05, 0.06);
-    o.connect(g); g.connect(ctx2.destination);
-    o.start(); o.stop(ctx2.currentTime + 0.2);
-  } else if (type === 'levelup') {
-    [523,659,784,1047].forEach((f,i) => {
-      const o = ctx2.createOscillator(), g = ctx2.createGain();
-      o.type = 'triangle'; o.frequency.value = f;
-      g.gain.value = 0.1; g.gain.setTargetAtTime(0, ctx2.currentTime + 0.15 + i*0.1, 0.08);
-      o.connect(g); g.connect(ctx2.destination);
-      o.start(ctx2.currentTime + i * 0.12);
-      o.stop(ctx2.currentTime + 0.5 + i * 0.12);
-    });
-  }
-}
-
-function playSpaceMusic() {
-  if (!audioCtx || musicNodes.master) return;
-  const master = audioCtx.createGain();
-  master.gain.value = 0.35;
-  master.connect(audioCtx.destination);
-  musicNodes.master = master;
-
-  function makeDrone(freq, vol) {
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    g.gain.value = vol;
-    osc.connect(g); g.connect(master);
-    osc.start();
-    return { osc, g };
+  function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
 
-  const chords = [
-    [110, 138.6, 164.8], [98,  123.5, 146.8], [130.8, 164.8, 196], [110, 138.6, 164.8],
-  ];
-  let chordIdx = 0;
-  const padOscs = [];
+  // Sonido MIAU (ronroneo agudo)
+  function playMeow() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    osc1.type = 'sine';
+    osc2.type = 'triangle';
+    filter.type = 'lowpass';
+    filter.frequency.value = 1500;
+    gain.gain.value = 0.2;
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc1.frequency.setValueAtTime(950, now);
+    osc1.frequency.exponentialRampToValueAtTime(420, now + 0.28);
+    osc2.frequency.setValueAtTime(820, now);
+    osc2.frequency.exponentialRampToValueAtTime(380, now + 0.25);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+    osc1.start(); osc2.start();
+    osc1.stop(now + 0.5); osc2.stop(now + 0.5);
+  }
 
-  function playChord() {
-    padOscs.forEach(n => { n.g.gain.setTargetAtTime(0, audioCtx.currentTime, 1.2); setTimeout(() => { try { n.osc.stop(); } catch(e){} }, 3000); });
-    padOscs.length = 0;
-    const chord = chords[chordIdx % chords.length];
-    chord.forEach(f => {
+  function playSFX(type) {
+    if (!audioCtx) return;
+    if (type === 'meow') { playMeow(); return; }
+    if (type === 'jump') {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = 330; o.frequency.setTargetAtTime(660, audioCtx.currentTime, 0.08);
+      g.gain.value = 0.07; g.gain.setTargetAtTime(0, audioCtx.currentTime + 0.05, 0.06);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime + 0.2);
+    } else if (type === 'hurt') {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sawtooth'; o.frequency.value = 220; o.frequency.setTargetAtTime(55, audioCtx.currentTime, 0.15);
+      g.gain.value = 0.15; g.gain.setTargetAtTime(0, audioCtx.currentTime + 0.1, 0.1);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime + 0.4);
+    } else if (type === 'levelup') {
+      [523,659,784,1047].forEach((f,i) => {
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = 'triangle'; o.frequency.value = f;
+        g.gain.value = 0.1; g.gain.setTargetAtTime(0, audioCtx.currentTime + 0.15 + i*0.1, 0.08);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(audioCtx.currentTime + i * 0.12);
+        o.stop(audioCtx.currentTime + 0.5 + i * 0.12);
+      });
+    }
+  }
+
+  function playSpaceMusic() {
+    if (!audioCtx || musicNodes.master) return;
+    const master = audioCtx.createGain();
+    master.gain.value = 0.35;
+    master.connect(audioCtx.destination);
+    musicNodes.master = master;
+    const chords = [[110,138.6,164.8],[98,123.5,146.8],[130.8,164.8,196],[110,138.6,164.8]];
+    let chordIdx = 0;
+    let padOscs = [];
+    function playChord() {
+      padOscs.forEach(n => { n.g.gain.setTargetAtTime(0, audioCtx.currentTime, 1.2); setTimeout(() => { try { n.osc.stop(); } catch(e){} }, 3000); });
+      padOscs = [];
+      chords[chordIdx % chords.length].forEach(f => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+        osc.type = 'triangle'; osc.frequency.value = f;
+        filter.type = 'lowpass'; filter.frequency.value = 800;
+        g.gain.value = 0; g.gain.setTargetAtTime(0.065, audioCtx.currentTime, 0.8);
+        osc.connect(filter); filter.connect(g); g.connect(master);
+        osc.start();
+        padOscs.push({ osc, g });
+      });
+      chordIdx++;
+    }
+    playChord();
+    musicNodes.chordInterval = setInterval(playChord, 5000);
+    function spaceBlip() {
       const osc = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      const filter = audioCtx.createBiquadFilter();
-      osc.type = 'triangle';
-      osc.frequency.value = f;
-      filter.type = 'lowpass';
-      filter.frequency.value = 800;
-      g.gain.value = 0;
-      g.gain.setTargetAtTime(0.065, audioCtx.currentTime, 0.8);
-      osc.connect(filter); filter.connect(g); g.connect(master);
-      osc.start();
-      padOscs.push({ osc, g });
+      const env = audioCtx.createGain();
+      osc.type = 'sine'; osc.frequency.value = 880 + Math.random() * 440;
+      osc.frequency.setTargetAtTime(220, audioCtx.currentTime, 0.1);
+      env.gain.value = 0.08; env.gain.setTargetAtTime(0, audioCtx.currentTime + 0.02, 0.08);
+      osc.connect(env); env.connect(master);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+      musicNodes.blipTimeout = setTimeout(spaceBlip, 1200 + Math.random() * 2800);
+    }
+    spaceBlip();
+    const drone = (freq, vol) => { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = 'sine'; o.frequency.value = freq; g.gain.value = vol; o.connect(g); g.connect(master); o.start(); };
+    drone(55, 0.12); drone(82.4, 0.06);
+  }
+
+  function stopSpaceMusic() {
+    if (!musicNodes.master) return;
+    clearInterval(musicNodes.chordInterval);
+    clearTimeout(musicNodes.blipTimeout);
+    musicNodes.master.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
+    setTimeout(() => { try { musicNodes.master.disconnect(); } catch(e){} musicNodes = {}; }, 1500);
+  }
+
+  function toggleMusic() {
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    musicOn = !musicOn;
+    document.getElementById('musicBtn').textContent = musicOn ? '🔊' : '🔇';
+    if (musicOn) playSpaceMusic();
+    else stopSpaceMusic();
+  }
+
+  // Salida del juego (EXIT)
+  function exitGame() {
+    if (!gameRunning) return;
+    gameRunning = false;
+    if (musicOn) stopSpaceMusic();
+    document.getElementById('overlayTitle').innerText = 'MISIÓN ABORTADA 🚪';
+    document.getElementById('overlaySub').innerHTML = 'Saliste del juego. ¡Vuelve cuando quieras explorar el cosmos!';
+    document.getElementById('overlayScore').style.display = 'block';
+    document.getElementById('overlayScore').innerText = `🧶 Puntaje: ${score}  ·  ${levelCfg.orbitLabel || 'Órbita 1'}`;
+    document.getElementById('overlay').classList.remove('hidden');
+  }
+
+  // Variables del juego
+  let gameRunning = false;
+  let score = 0, lives = 3, level = 1;
+  let particles = [], shootingStars = [], bgStars = [], nebulae = [], moonCraters = [];
+  let platforms = [], hazards = [], yarnBall = {};
+  let maat = {};
+  let invincibleTimer = 0, jumpRequested = false;
+  let keys = { left: false, right: false };
+  let frameCount = 0;
+  let levelClearing = false, levelClearTimer = 0;
+  let yarnsThisLevel = 0, levelCfg = {};
+
+  function getLevelCfg(l) {
+    const b = l-1;
+    return { yarnsNeeded: 4 + b*2, hazardSpeed: (0.4 + b*0.35)*S, orbitLabel: ['ÓRBITA 1','LUNA','ASTEROIDE','NEBULOSA','ABISMO'][Math.min(b,4)], bgDarkness: Math.min(b*0.12,0.5) };
+  }
+
+  function rebuildLevel() {
+    levelCfg = getLevelCfg(level);
+    const ph = 13 * S;
+    const raw = [
+      [0.02,0.88,0.20,ph],[0.25,0.83,0.17,ph],[0.46,0.88,0.18,ph],[0.68,0.85,0.17,ph],[0.82,0.90,0.16,ph],
+      [0.03,0.72,0.14,ph],[0.22,0.67,0.14,ph],[0.42,0.70,0.12,ph],[0.60,0.68,0.14,ph],[0.78,0.72,0.13,ph],
+      [0.10,0.54,0.12,ph],[0.32,0.52,0.11,ph],[0.55,0.54,0.12,ph],[0.74,0.56,0.11,ph],
+      [0.20,0.38,0.10,ph],[0.46,0.36,0.10,ph],[0.68,0.40,0.09,ph]
+    ];
+    platforms = raw.map(r => ({ x: r[0]*W, y: r[1]*H, w: r[2]*W, h: r[3] }));
+    platforms.push({ x:0, y:H+10, w:W, h:20 });
+    const rawH = [[0.27,0.805],[0.50,0.855],[0.72,0.825],[0.26,0.640],[0.64,0.650],[0.34,0.490],[0.77,0.535]];
+    hazards = rawH.map(([rx,ry],i) => ({ x: rx*W, y: ry*H - 16*S, w: 14*S, h: 16*S, baseX: rx*W, dir: i%2===0?1:-1, speed: levelCfg.hazardSpeed*(0.7+i*0.15), range: 22*S, type: i%3 }));
+    bgStars = Array.from({length:160}, () => ({ x:Math.random()*W, y:Math.random()*H*0.8, r:Math.random()*2+0.5, alpha:Math.random()*0.7+0.2, twinkle:Math.random()*Math.PI*2, speed:Math.random()*0.04 }));
+    nebulae = Array.from({length:4}, () => ({ x:Math.random()*W, y:Math.random()*H*0.6, rx:(80+Math.random()*120)*S, ry:(40+Math.random()*80)*S, hue:[260,300][Math.floor(Math.random()*2)], alpha:0.04+Math.random()*0.06 }));
+    moonCraters = Array.from({length:8}, () => ({ x:(0.06+Math.random()*0.7)*W, y:H-6*S, r:(4+Math.random()*8)*S }));
+    shootingStars = [];
+    if (!maat.x) resetMaatPos();
+    respawnYarn();
+  }
+
+  function resetMaatPos() {
+    maat = { x: 60*S, y: H*0.82, vx:0, vy:0, w:30*S, h:30*S, grounded:false, facingRight:true,
+      jumpPower: -11*S, gravity: 0.55*S, maxSpeed: 5*S, friction:0.87, accel:0.7*S };
+  }
+
+  function respawnYarn() {
+    const safe = platforms.filter(p => p.y < H*0.95);
+    const p = safe[Math.floor(Math.random()*safe.length)];
+    let cx = p.x + p.w/2, cy = p.y - 11*S;
+    if (maat.x && Math.abs(maat.x-cx) < 40*S) cx = (cx + 120*S) % (W - 20*S);
+    yarnBall = { x:cx, y:cy, r:9*S, collected:false, bob:Math.random()*Math.PI*2, glow:0, spin:0 };
+  }
+
+  function updateGame() {
+    if (levelClearing) {
+      levelClearTimer--;
+      if (levelClearTimer <= 0) nextLevel();
+      return;
+    }
+    for (let h of hazards) {
+      h.x += h.speed * h.dir;
+      if (Math.abs(h.x - h.baseX) > h.range) h.dir *= -1;
+    }
+    if (keys.left) { maat.vx = Math.max(-maat.maxSpeed, maat.vx - maat.accel); maat.facingRight = false; }
+    if (keys.right) { maat.vx = Math.min(maat.maxSpeed, maat.vx + maat.accel); maat.facingRight = true; }
+    if (!keys.left && !keys.right) maat.vx *= maat.friction;
+    maat.vy += maat.gravity;
+    maat.x += maat.vx; maat.y += maat.vy;
+    if (maat.x < 0) { maat.x=0; maat.vx=0; }
+    if (maat.x+maat.w > W) { maat.x=W-maat.w; maat.vx=0; }
+    maat.grounded = false;
+    for (let p of platforms) {
+      if (maat.vy >= 0 && maat.x+maat.w > p.x+4 && maat.x < p.x+p.w-4 && maat.y+maat.h <= p.y+8 && maat.y+maat.h+maat.vy >= p.y) {
+        maat.y = p.y - maat.h; maat.vy = 0; maat.grounded = true;
+      }
+    }
+    if (jumpRequested && maat.grounded) { maat.vy = maat.jumpPower; jumpRequested = false; playSFX('jump'); }
+    jumpRequested = false;
+    if (maat.y > H+60) { hurtMaat(); resetMaatPos(); }
+    if (invincibleTimer <= 0) {
+      for (let h of hazards) {
+        if (maat.x+maat.w > h.x+4 && maat.x < h.x+h.w-4 && maat.y+maat.h > h.y+4 && maat.y < h.y+h.h-4) {
+          hurtMaat(); maat.vx = maat.facingRight ? -5*S : 5*S; maat.vy = -6*S; break;
+        }
+      }
+    }
+    if (invincibleTimer > 0) invincibleTimer--;
+    // Ovillo
+    yarnBall.bob += 0.07; yarnBall.spin += 0.03;
+    yarnBall.glow = 0.5 + 0.5*Math.sin(frameCount*0.09);
+    if (!yarnBall.collected) {
+      const dx = maat.x+maat.w/2 - yarnBall.x;
+      const dy = maat.y+maat.h/2 - yarnBall.y;
+      if (Math.hypot(dx,dy) < yarnBall.r + maat.w/2 - 4) {
+        yarnBall.collected = true;
+        score++; yarnsThisLevel++;
+        updateHUD();
+        spawnCollectBurst(yarnBall.x, yarnBall.y);
+        showFloat(yarnBall.x, yarnBall.y, '+1 🧶 ¡MIAU!');
+        playSFX('meow');  // <<< SONIDO MIAU
+        if (score % 8 === 0 && lives < 5) { lives++; updateHUD(); showFloat(maat.x, maat.y-20*S, '❤️ +Vida'); }
+        if (yarnsThisLevel >= levelCfg.yarnsNeeded) { levelClearing = true; levelClearTimer = 100; playSFX('levelup'); }
+        else setTimeout(respawnYarn, 500);
+      }
+    }
+    // Partículas
+    for (let i=particles.length-1;i>=0;i--) {
+      let p=particles[i];
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.18*S; p.life-=p.decay;
+      if(p.life<=0) particles.splice(i,1);
+    }
+    frameCount++;
+    if (frameCount % 180 === 0 && shootingStars.length<3) shootingStars.push({ x:Math.random()*W*0.7, y:Math.random()*H*0.3, vx:(3+Math.random()*4)*S, vy:(1.5+Math.random()*2)*S, len:(30+Math.random()*60)*S, life:1 });
+    for (let i=shootingStars.length-1;i>=0;i--) { let s=shootingStars[i]; s.x+=s.vx; s.y+=s.vy; s.life-=0.015; if(s.life<=0 || s.x>W || s.y>H) shootingStars.splice(i,1); }
+    for (let s of bgStars) { s.twinkle += s.speed; s.alpha = 0.25 + 0.65*Math.abs(Math.sin(s.twinkle)); }
+  }
+
+  function hurtMaat() {
+    lives--; invincibleTimer = 75;
+    spawnHurtBurst(maat.x+maat.w/2, maat.y+maat.h/2);
+    updateHUD(); playSFX('hurt');
+    document.getElementById('hud').classList.add('hud-shake');
+    setTimeout(()=>document.getElementById('hud').classList.remove('hud-shake'),400);
+    if (lives<=0) endGame();
+  }
+
+  function nextLevel() { level++; yarnsThisLevel=0; levelClearing=false; rebuildLevel(); resetMaatPos(); updateHUD(); }
+
+  function endGame() {
+    gameRunning = false;
+    document.getElementById('overlayTitle').innerText = 'MISIÓN FALLIDA 💀';
+    document.getElementById('overlaySub').innerHTML = 'Maat se quedó sin oxígeno...<br>La Luna seguirá esperando.';
+    document.getElementById('overlayScore').style.display = 'block';
+    document.getElementById('overlayScore').innerText = `🧶 Ovillos: ${score}  ·  ${levelCfg.orbitLabel||'Órbita 1'}`;
+    document.getElementById('overlay').classList.remove('hidden');
+  }
+
+  function updateHUD() {
+    document.getElementById('scoreDisplay').innerText = String(score).padStart(3,'0');
+    document.getElementById('levelDisplay').innerText = levelCfg.orbitLabel || `ÓRBITA ${level}`;
+    const hearts = '🐾'.repeat(lives) + '💀'.repeat(Math.max(0,3-lives));
+    document.getElementById('livesDisplay').innerText = hearts;
+  }
+
+  function showFloat(x,y,text) {
+    const el = document.createElement('div'); el.className='float-text'; el.textContent=text;
+    el.style.left = Math.min(Math.max(x-50,8),W-140)+'px';
+    el.style.top = Math.min(Math.max(y-20,8),H-50)+'px';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 1050);
+  }
+
+  function spawnCollectBurst(x,y) { spawnParticles(x,y,['#ffe97a','#22d3ee','#a78bfa','#fff'],20); }
+  function spawnHurtBurst(x,y) { spawnParticles(x,y,['#ef4444','#f97316','#fff'],12); }
+  function spawnParticles(x,y,colors,n) {
+    for(let i=0;i<n;i++) {
+      let a=Math.random()*Math.PI*2, spd=(1.5+Math.random()*4)*S;
+      particles.push({ x,y, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd-2*S, r:(2+Math.random()*4)*S, color:colors[Math.floor(Math.random()*colors.length)], life:1, decay:0.03+Math.random()*0.04 });
+    }
+  }
+
+  // Dibujos
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    drawSpace(); drawPlatforms(); drawHazards();
+    if (!yarnBall.collected) drawYarn();
+    drawParticles(); drawMaat(); drawProgressBar();
+  }
+
+  function drawSpace() {
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,`#030a1a`); grad.addColorStop(1,`#0e1a2a`);
+    ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+    for (let n of nebulae) {
+      ctx.globalAlpha=n.alpha;
+      const gr = ctx.createRadialGradient(n.x,n.y,0, n.x,n.y,n.rx);
+      gr.addColorStop(0,`hsla(${n.hue},80%,70%,1)`); gr.addColorStop(1,`hsla(${n.hue},60%,40%,0)`);
+      ctx.fillStyle=gr; ctx.save(); ctx.translate(n.x,n.y); ctx.scale(1,n.ry/n.rx); ctx.translate(-n.x,-n.y);
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.rx,0,Math.PI*2); ctx.fill(); ctx.restore();
+    }
+    ctx.globalAlpha=1;
+    for (let s of bgStars) { ctx.globalAlpha=s.alpha; ctx.fillStyle=s.r>1.5?'#ffe97a':'#fff'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); }
+    ctx.globalAlpha=1;
+    for (let ss of shootingStars) {
+      ctx.save(); ctx.globalAlpha=ss.life*0.8;
+      const sg = ctx.createLinearGradient(ss.x-ss.vx*8,ss.y-ss.vy*8, ss.x,ss.y);
+      sg.addColorStop(0,'rgba(255,255,255,0)'); sg.addColorStop(1,'rgba(200,230,255,0.9)');
+      ctx.strokeStyle=sg; ctx.lineWidth=2*S;
+      ctx.beginPath(); ctx.moveTo(ss.x-ss.vx*12,ss.y-ss.vy*12); ctx.lineTo(ss.x,ss.y); ctx.stroke(); ctx.restore();
+    }
+    // Luna
+    const mx=W*0.82, my=H*0.15, mr=55*S;
+    ctx.shadowBlur=20*S; ctx.shadowColor='rgba(200,216,240,0.4)';
+    ctx.fillStyle='#eef3ff'; ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0; ctx.fillStyle='rgba(100,130,170,0.4)';
+    [[0.3,0.2,0.18],[0.6,0.55,0.12],[0.2,0.65,0.08]].forEach(([fx,fy,fr])=>{ ctx.beginPath(); ctx.arc(mx+fx*mr*2-mr, my+fy*mr*2-mr, fr*mr, 0, Math.PI*2); ctx.fill(); });
+    const gy=H-13*S; ctx.fillStyle='#8090a8'; ctx.fillRect(0,gy,W,13*S);
+    ctx.fillStyle='rgba(50,60,80,0.5)';
+    for(let c of moonCraters) { ctx.beginPath(); ctx.ellipse(c.x,c.y,c.r,c.r*0.35,0,0,Math.PI*2); ctx.fill(); }
+  }
+
+  function drawPlatforms() {
+    for(let p of platforms){
+      if(p.y>=H) continue;
+      ctx.fillStyle='#9aafc8'; ctx.shadowBlur=8*S; ctx.shadowColor='rgba(0,0,0,0.3)';
+      ctx.fillRect(p.x,p.y,p.w,p.h);
+      ctx.fillStyle='rgba(34,211,238,0.3)'; ctx.fillRect(p.x+3,p.y,p.w-6,3);
+      ctx.fillStyle='rgba(0,0,0,0.2)';
+      for(let i=0;i<3;i++) ctx.fillRect(p.x+8+i*15,p.y+4,3,p.h-7);
+      ctx.shadowBlur=0;
+    }
+  }
+
+  function drawHazards() {
+    for(let h of hazards){
+      const cx=h.x+h.w/2, cy=h.y+h.h/2;
+      ctx.fillStyle=h.type===0?'#8b7355':h.type===1?'#60a5fa':'#dc2626';
+      ctx.beginPath(); ctx.ellipse(cx,cy,h.w/2,h.h/2,0,0,Math.PI*2); ctx.fill();
+      if(h.type===1){ ctx.fillStyle='#ef4444'; ctx.beginPath(); ctx.arc(cx-h.w*0.2,cy-h.h*0.2,h.w*0.2,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(cx+h.w*0.2,cy-h.h*0.2,h.w*0.2,0,Math.PI*2); ctx.fill(); }
+      if(h.type===2){ for(let i=0;i<6;i++){ const a=i*Math.PI*2/6; ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*h.w/2, cy+Math.sin(a)*h.h/2); ctx.lineTo(cx+Math.cos(a)*h.w, cy+Math.sin(a)*h.h); ctx.lineWidth=3; ctx.strokeStyle='#f97316'; ctx.stroke(); } }
+    }
+  }
+
+  function drawYarn() {
+    const bx=yarnBall.x, by=yarnBall.y+Math.sin(yarnBall.bob)*5*S;
+    ctx.shadowBlur=20*S*yarnBall.glow; ctx.shadowColor='rgba(167,139,250,0.8)';
+    ctx.fillStyle='#a78bfa'; ctx.beginPath(); ctx.arc(bx,by,yarnBall.r,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0; ctx.save(); ctx.translate(bx,by); ctx.rotate(yarnBall.spin);
+    for(let i=0;i<4;i++){ ctx.fillStyle=['#c4b5fd','#7c3aed','#ddd6fe','#6d28d9'][i]; ctx.beginPath(); ctx.ellipse(Math.cos(i*Math.PI/2)*yarnBall.r*0.4,Math.sin(i*Math.PI/2)*yarnBall.r*0.4, yarnBall.r*0.55,yarnBall.r*0.3, i*Math.PI/2,0,Math.PI*2); ctx.fill(); }
+    ctx.restore();
+  }
+
+  function drawMaat() {
+    const x=maat.x, y=maat.y, s=S;
+    if(invincibleTimer>0 && Math.floor(frameCount/4)%2===0) ctx.globalAlpha=0.5;
+    ctx.save();
+    if(!maat.facingRight){ ctx.translate(x+maat.w,0); ctx.scale(-1,1); ctx.translate(-x,0); }
+    ctx.fillStyle='#dde8f5'; ctx.beginPath(); ctx.ellipse(x+maat.w/2, y+maat.h*0.6, maat.w/2-2, maat.h*0.38,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#f97316'; ctx.fillRect(x+6*s, y+maat.h*0.45, maat.w-12*s, 4*s);
+    // PARCHES: bandera argentina y huella
+    ctx.save(); ctx.translate(x+maat.w*0.28, y+maat.h*0.62); ctx.scale(0.7,0.7);
+    ctx.fillStyle='#74ACDF'; ctx.fillRect(-12,-8,24,5); ctx.fillStyle='#FFFFFF'; ctx.fillRect(-12,-3,24,5); ctx.fillStyle='#74ACDF'; ctx.fillRect(-12,2,24,5);
+    ctx.fillStyle='#FFD966'; ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    ctx.save(); ctx.translate(x+maat.w*0.72, y+maat.h*0.62); ctx.fillStyle='#f59e0b';
+    ctx.beginPath(); ctx.ellipse(0,0,6,5,0,0,Math.PI*2); ctx.fill();
+    for(let i=-1;i<=1;i++){ ctx.beginPath(); ctx.ellipse(i*7,-5,3,3.5,0,0,Math.PI*2); ctx.fill(); }
+    ctx.beginPath(); ctx.ellipse(0,-11,3,4,0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    ctx.fillStyle='#8fa8c8'; ctx.fillRect(x-3*s,y+maat.h*0.4,5*s,maat.h*0.3); ctx.fillRect(x+maat.w-2*s,y+maat.h*0.4,5*s,maat.h*0.3);
+    ctx.fillStyle='#7c3aed'; ctx.beginPath(); ctx.arc(x-1.5*s,y+maat.h*0.7,3.5*s,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(x+maat.w+1.5*s,y+maat.h*0.7,3.5*s,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#374151'; ctx.fillRect(x+4*s,y+maat.h-4*s,maat.w*0.35,4*s); ctx.fillRect(x+maat.w-4*s-maat.w*0.35,y+maat.h-4*s,maat.w*0.35,4*s);
+    ctx.fillStyle='#c8d8f0'; ctx.beginPath(); ctx.arc(x+maat.w/2, y-2*s, 14*s,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#8fa8c8'; ctx.fillRect(x+7*s,y+maat.h*0.28,maat.w-14*s,5*s);
+    const visGrad=ctx.createRadialGradient(x+maat.w/2-3*s,y-5*s,0, x+maat.w/2,y-2*s,11*s);
+    visGrad.addColorStop(0,'rgba(59,130,246,0.55)'); visGrad.addColorStop(1,'rgba(14,68,180,0.45)');
+    ctx.fillStyle=visGrad; ctx.beginPath(); ctx.arc(x+maat.w/2,y-2*s,11*s,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.beginPath(); ctx.ellipse(x+maat.w/2-3*s,y-8*s,4*s,2.5*s,-0.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#b09070'; ctx.beginPath(); ctx.arc(x+maat.w/2, y-2*s, 8.5*s,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#e8dcc8'; ctx.beginPath(); ctx.ellipse(x+maat.w/2,y,5*s,4*s,0,0,Math.PI*2); ctx.fill();
+    [x+maat.w/2-4*s,x+maat.w/2+4*s].forEach(ex=>{
+      ctx.fillStyle='#fff'; ctx.beginPath(); ctx.ellipse(ex,y-3*s,3*s,2.5*s,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#8bc34a'; ctx.beginPath(); ctx.arc(ex,y-3*s,2*s,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#1a1a1a'; ctx.beginPath(); ctx.arc(ex,y-3*s,1.1*s,0,Math.PI*2); ctx.fill();
     });
-    chordIdx++;
+    ctx.fillStyle='#e8748a'; ctx.beginPath(); ctx.moveTo(x+maat.w/2,y+1*s); ctx.lineTo(x+maat.w/2-2*s,y-0.5*s); ctx.lineTo(x+maat.w/2+2*s,y-0.5*s); ctx.fill();
+    ctx.restore();
+    ctx.globalAlpha=1;
   }
 
-  playChord();
-  musicNodes.chordInterval = setInterval(playChord, 5000);
-
-  function spaceBlip() {
-    const osc = audioCtx.createOscillator();
-    const env = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = 880 + Math.random() * 440;
-    osc.frequency.setTargetAtTime(220, audioCtx.currentTime, 0.1);
-    env.gain.value = 0.08;
-    env.gain.setTargetAtTime(0, audioCtx.currentTime + 0.02, 0.08);
-    osc.connect(env); env.connect(master);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.3);
-    const delay = 1200 + Math.random() * 2800;
-    musicNodes.blipTimeout = setTimeout(spaceBlip, delay);
+  function drawProgressBar() {
+    const total=levelCfg.yarnsNeeded||4, done=Math.min(yarnsThisLevel,total);
+    const bw=140*S, bh=8*S, bx=W/2-bw/2, by=H-24*S;
+    ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(bx,by,bw,bh);
+    const pGrad=ctx.createLinearGradient(bx,0,bx+bw,0); pGrad.addColorStop(0,'#22d3ee'); pGrad.addColorStop(1,'#7c3aed');
+    ctx.fillStyle=pGrad; ctx.fillRect(bx,by,bw*(done/total),bh);
+    ctx.fillStyle='rgba(200,216,240,0.8)'; ctx.font=`${9*S}px Orbitron`; ctx.textAlign='center'; ctx.fillText(`${done}/${total} 🧶`,W/2,by-6); ctx.textAlign='left';
   }
-  spaceBlip();
-  makeDrone(55, 0.12);
-  makeDrone(82.4, 0.06);
-}
 
-function stopSpaceMusic() {
-  if (!musicNodes.master) return;
-  clearInterval(musicNodes.chordInterval);
-  clearTimeout(musicNodes.blipTimeout);
-  musicNodes.master.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
-  setTimeout(() => { try { musicNodes.master.disconnect(); } catch(e) {} musicNodes = {}; }, 1500);
-}
-
-function toggleMusic() {
-  initAudio();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  musicOn = !musicOn;
-  document.getElementById('musicBtn').textContent = musicOn ? '🔊' : '🔇';
-  if (musicOn) playSpaceMusic();
-  else stopSpaceMusic();
-}
-
-// ── EXIT GAME ──
-function exitGame() {
-  if (!gameRunning) return;
-  gameRunning = false;
-  if (musicOn) stopSpaceMusic();
-  document.getElementById('overlayTitle').textContent = 'MISIÓN ABORTADA 🚪';
-  document.getElementById('overlaySub').textContent = 'Saliste del juego. ¡Vuelve cuando quieras explorar el cosmos!';
-  const scDiv = document.getElementById('overlayScore');
-  scDiv.style.display = 'block';
-  scDiv.textContent = `🧶 Puntaje final: ${score}  ·  ${levelCfg.orbitLabel || 'Órbita 1'}`;
-  document.getElementById('overlay').classList.remove('hidden');
-}
-
-// ── RESIZE ────────────────────────────────────────────────
-function resize() {
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-  S = Math.min(W / 620, H / 420);
-  if (gameRunning) rebuildLevel();
-}
-window.addEventListener('resize', resize);
-
-// ── STATE ─────────────────────────────────────────────────
-let score = 0, lives = 3, level = 1;
-let gameRunning = false;
-let particles = [], shootingStars = [], moonCraters = [];
-let platforms = [], hazards = [], yarnBall = {};
-let maat = {};
-let invincibleTimer = 0, jumpRequested = false;
-let keys = { left: false, right: false };
-let frameCount = 0;
-let levelClearing = false, levelClearTimer = 0;
-let yarnsThisLevel = 0, levelCfg = {};
-let bgStars = [], nebulae = [];
-
-// Mobile touch
-const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
-if (isMobile) document.getElementById('touchControls').classList.add('active');
-
-function setupTouch() {
-  const bind = (id, down, up) => {
-    const el = document.getElementById(id);
-    const d = e => { e.preventDefault(); el.classList.add('pressed'); down(); };
-    const u = e => { e.preventDefault(); el.classList.remove('pressed'); if(up) up(); };
-    el.addEventListener('touchstart', d, {passive:false});
-    el.addEventListener('touchend', u, {passive:false});
-    el.addEventListener('mousedown', d);
-    el.addEventListener('mouseup', u);
-  };
-  bind('btnLeft', ()=>keys.left=true, ()=>keys.left=false);
-  bind('btnRight', ()=>keys.right=true, ()=>keys.right=false);
-  bind('btnJump', ()=>jumpRequested=true, null);
-}
-setupTouch();
-
-window.addEventListener('keydown', e => {
-  if (e.key==='ArrowLeft'||e.key==='a') keys.left=true;
-  if (e.key==='ArrowRight'||e.key==='d') keys.right=true;
-  if (e.key===' '||e.key==='ArrowUp'||e.key==='w') { e.preventDefault(); jumpRequested=true; }
-  if ((e.key==='r'||e.key==='R') && !gameRunning) startGame();
-});
-window.addEventListener('keyup', e => {
-  if (e.key==='ArrowLeft'||e.key==='a') keys.left=false;
-  if (e.key==='ArrowRight'||e.key==='d') keys.right=false;
-});
-
-function getLevelCfg(l) {
-  const b = l - 1;
-  return {
-    yarnsNeeded: 4 + b * 2,
-    hazardSpeed: (0.4 + b * 0.35) * S,
-    moonPhase: ['🌕','🌖','🌗','🌘','🌑'][Math.min(b,4)],
-    bgDarkness: Math.min(b * 0.12, 0.5),
-    orbitLabel: ['ÓRBITA 1','LUNA','ASTEROIDE','NEBULOSA','ABISMO'][Math.min(b,4)],
-  };
-}
-
-function rebuildLevel() {
-  levelCfg = getLevelCfg(level);
-  const ph = 13 * S;
-  const raw = [
-    [0.02, 0.88, 0.20, ph], [0.25, 0.83, 0.17, ph], [0.46, 0.88, 0.18, ph],
-    [0.68, 0.85, 0.17, ph], [0.82, 0.90, 0.16, ph],
-    [0.03, 0.72, 0.14, ph], [0.22, 0.67, 0.14, ph], [0.42, 0.70, 0.12, ph],
-    [0.60, 0.68, 0.14, ph], [0.78, 0.72, 0.13, ph],
-    [0.10, 0.54, 0.12, ph], [0.32, 0.52, 0.11, ph], [0.55, 0.54, 0.12, ph],
-    [0.74, 0.56, 0.11, ph], [0.20, 0.38, 0.10, ph], [0.46, 0.36, 0.10, ph], [0.68, 0.40, 0.09, ph],
-  ];
-  platforms = raw.map(([rx,ry,rw,rh]) => ({ x:rx*W, y:ry*H, w:rw*W, h:rh }));
-  platforms.push({ x:0, y:H+10, w:W, h:20 });
-  const rawH = [
-    [0.27,0.805],[0.50,0.855],[0.72,0.825],
-    [0.26,0.640],[0.64,0.650],[0.34,0.490],[0.77,0.535],
-  ];
-  hazards = rawH.map(([rx,ry],i) => {
-    const hh = 16*S, hw = 14*S;
-    return {
-      x: rx*W, y: ry*H - hh, w: hw, h: hh,
-      baseX: rx*W, dir: i%2===0 ? 1 : -1,
-      speed: levelCfg.hazardSpeed * (0.7 + i*0.15),
-      range: 22*S, type: i%3
-    };
-  });
-  bgStars = Array.from({length:180}, () => ({ x: Math.random()*W, y: Math.random()*H*0.85, r: Math.random()*2+0.3, alpha: Math.random()*0.8+0.2, twinkle: Math.random()*Math.PI*2, speed: Math.random()*0.04+0.01 }));
-  nebulae = Array.from({length:4}, () => ({ x: Math.random()*W, y: Math.random()*H*0.6, rx: (80+Math.random()*120)*S, ry: (40+Math.random()*80)*S, hue: [260,300,200,180][Math.floor(Math.random()*4)], alpha: 0.04 + Math.random()*0.06 }));
-  moonCraters = Array.from({length:8}, (_, i) => ({ x: (0.06+i*0.13)*W + (Math.random()-0.5)*20*S, y: H - 6*S, r: (4+Math.random()*8)*S }));
-  shootingStars = [];
-  if (!maat.x) resetMaatPos();
-  respawnYarn();
-}
-
-function resetMaatPos() {
-  maat = {
-    x: 60*S, y: H*0.82, vx:0, vy:0,
-    w: 30*S, h: 30*S, grounded:false, facingRight:true,
-    jumpPower: -11*S, gravity: 0.55*S,
-    maxSpeed: 5*S, friction: 0.87, accel: 0.7*S
-  };
-}
-
-function respawnYarn() {
-  const safe = platforms.filter(p => p.y < H*0.95);
-  const p = safe[Math.floor(Math.random()*safe.length)];
-  let cx = p.x + p.w/2, cy = p.y - 11*S;
-  if (maat.x && Math.abs(maat.x - cx) < 40*S) cx = (cx + 120*S) % (W - 20*S);
-  yarnBall = { x:cx, y:cy, r:9*S, collected:false, bob:Math.random()*Math.PI*2, glow:0, spin:0 };
-}
-
-// ── NUEVOS PARCHES: bandera argentina + huella ──
-function drawArgentinaFlag(x, y, size) {
-  ctx.save(); ctx.translate(x, y); ctx.scale(1,1);
-  const w = size*1.2, h = size*0.9;
-  ctx.fillStyle = '#74ACDF'; // celeste
-  ctx.fillRect(-w/2, -h/2, w, h/3);
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillRect(-w/2, -h/2 + h/3, w, h/3);
-  ctx.fillStyle = '#74ACDF';
-  ctx.fillRect(-w/2, -h/2 + 2*h/3, w, h/3);
-  // Solcito
-  ctx.fillStyle = '#FFD966';
-  ctx.beginPath(); ctx.arc(0, 0, size*0.25, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#E6A500';
-  for(let i=0;i<12;i++) {
-    const ang = i*Math.PI*2/12;
-    ctx.beginPath(); ctx.moveTo(Math.cos(ang)*size*0.32, Math.sin(ang)*size*0.32);
-    ctx.lineTo(Math.cos(ang)*size*0.48, Math.sin(ang)*size*0.48);
-    ctx.lineTo(Math.cos(ang)*size*0.55, Math.sin(ang)*size*0.4); ctx.fill();
+  function drawParticles(){
+    for(let p of particles){ ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2); ctx.fill(); }
+    ctx.globalAlpha=1;
   }
-  ctx.restore();
-}
 
-function drawPawPrint(x, y, size) {
-  ctx.save(); ctx.translate(x, y);
-  ctx.fillStyle = '#f59e0b';
-  ctx.shadowBlur = 0;
-  // almohadilla principal
-  ctx.beginPath(); ctx.ellipse(0, 0, size*0.4, size*0.35, 0, 0, Math.PI*2); ctx.fill();
-  // dedos
-  for (let i = -1; i <= 1; i++) {
-    ctx.beginPath(); ctx.ellipse(i*size*0.45, -size*0.3, size*0.2, size*0.24, 0, 0, Math.PI*2); ctx.fill();
+  function resizeCanvas() { W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; S=Math.min(W/620, H/420); if(gameRunning) rebuildLevel(); }
+  window.addEventListener('resize', resizeCanvas);
+  function startGame() {
+    initAudio(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+    score=0; lives=3; level=1; yarnsThisLevel=0; frameCount=0; levelClearing=false; particles=[];
+    gameRunning=true; resizeCanvas(); resetMaatPos(); rebuildLevel(); updateHUD();
+    document.getElementById('overlay').classList.add('hidden');
+    if(!musicOn){ musicOn=true; document.getElementById('musicBtn').textContent='🔊'; playSpaceMusic(); }
+    requestAnimationFrame(function loop(){ if(gameRunning){ updateGame(); draw(); requestAnimationFrame(loop); } });
   }
-  ctx.beginPath(); ctx.ellipse(0, -size*0.7, size*0.22, size*0.28, 0, 0, Math.PI*2); ctx.fill();
-  ctx.restore();
-}
 
-// Integración en drawMaat (modificada)
-function drawMaat() {
-  const x=maat.x, y=maat.y, s=S;
-  if (invincibleTimer>0 && Math.floor(frameCount/4)%2===0) ctx.globalAlpha=0.4;
-  ctx.save();
-  if (!maat.facingRight) { ctx.translate(x+maat.w,0); ctx.scale(-1,1); ctx.translate(-x,0); }
-
-  ctx.shadowBlur = 8*s; ctx.shadowColor = 'rgba(59,130,246,0.3)';
-  ctx.fillStyle = '#dde8f5';
-  ctx.beginPath(); ctx.ellipse(x+maat.w/2, y+maat.h*0.6, maat.w/2-1, maat.h*0.38, 0, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#f97316';
-  ctx.fillRect(x+6*s, y+maat.h*0.45, maat.w-12*s, 4*s);
-  
-  // === PARCHES especiales: bandera argentina (izquierda) y huella (derecha) ===
-  drawArgentinaFlag(x + maat.w*0.28, y + maat.h*0.62, 8*s);
-  drawPawPrint(x + maat.w*0.72, y + maat.h*0.62, 7*s);
-  
-  ctx.fillStyle = '#c8d8f0';
-  ctx.fillRect(x-3*s, y+maat.h*0.4, 5*s, maat.h*0.3);
-  ctx.fillRect(x+maat.w-2*s, y+maat.h*0.4, 5*s, maat.h*0.3);
-  ctx.fillStyle='#7c3aed';
-  ctx.beginPath(); ctx.arc(x-1.5*s,y+maat.h*0.7,3.5*s,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(x+maat.w+1.5*s,y+maat.h*0.7,3.5*s,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#8fa8c8';
-  ctx.fillRect(x+5*s,y+maat.h*0.85,maat.w*0.3,maat.h*0.2);
-  ctx.fillRect(x+maat.w-5*s-maat.w*0.3,y+maat.h*0.85,maat.w*0.3,maat.h*0.2);
-  ctx.fillStyle='#374151';
-  ctx.fillRect(x+4*s,y+maat.h-4*s,maat.w*0.35,4*s);
-  ctx.fillRect(x+maat.w-4*s-maat.w*0.35,y+maat.h-4*s,maat.w*0.35,4*s);
-  
-  ctx.shadowBlur = 14*s; ctx.shadowColor = 'rgba(59,130,246,0.5)';
-  ctx.fillStyle='#c8d8f0';
-  ctx.beginPath(); ctx.arc(x+maat.w/2, y-2*s, 14*s, 0, Math.PI*2); ctx.fill();
-  ctx.shadowBlur=0;
-  ctx.fillStyle='#8fa8c8';
-  ctx.fillRect(x+7*s,y+maat.h*0.28,maat.w-14*s,5*s);
-  const visGrad = ctx.createRadialGradient(x+maat.w/2-3*s, y-5*s, 0, x+maat.w/2, y-2*s, 11*s);
-  visGrad.addColorStop(0,'rgba(59,130,246,0.55)');
-  visGrad.addColorStop(0.6,'rgba(14,68,180,0.45)');
-  ctx.fillStyle = visGrad;
-  ctx.beginPath(); ctx.arc(x+maat.w/2, y-2*s, 11*s, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,0.35)';
-  ctx.beginPath(); ctx.ellipse(x+maat.w/2-3*s,y-8*s,4*s,2.5*s,-0.5,0,Math.PI*2); ctx.fill();
-  
-  // Cara gatuna dentro del visor
-  ctx.fillStyle='#b09070';
-  ctx.beginPath(); ctx.arc(x+maat.w/2, y-2*s, 8.5*s, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle='rgba(80,55,30,0.45)';
-  for(let i=0;i<3;i++) ctx.fillRect(x+maat.w/2-5*s+i*3.2*s, y-5*s, 1.8*s, 5*s);
-  ctx.fillStyle='#e8dcc8';
-  ctx.beginPath(); ctx.ellipse(x+maat.w/2,y,5*s,4*s,0,0,Math.PI*2); ctx.fill();
-  [x+maat.w/2-4*s, x+maat.w/2+4*s].forEach(ex => {
-    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.ellipse(ex,y-3*s,3*s,2.5*s,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='#8bc34a'; ctx.beginPath(); ctx.arc(ex,y-3*s,2*s,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='#1a1a1a'; ctx.beginPath(); ctx.arc(ex,y-3*s,1.1*s,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.beginPath(); ctx.arc(ex+0.8*s,y-4*s,0.7*s,0,Math.PI*2); ctx.fill();
-  });
-  ctx.fillStyle='#e8748a'; ctx.beginPath();
-  ctx.moveTo(x+maat.w/2,y+1*s); ctx.lineTo(x+maat.w/2-2*s,y-0.5*s); ctx.lineTo(x+maat.w/2+2*s,y-0.5*s); ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,0.55)'; ctx.lineWidth=0.8*s;
-  [[x+maat.w/2-2*s,y+1.5*s,x+maat.w/2-9*s,y+0.5*s],[x+maat.w/2-2*s,y+3*s,x+maat.w/2-8*s,y+3.5*s],
-   [x+maat.w/2+2*s,y+1.5*s,x+maat.w/2+9*s,y+0.5*s],[x+maat.w/2+2*s,y+3*s,x+maat.w/2+8*s,y+3.5*s]]
-    .forEach(([ax,ay,bx,by])=>{ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();});
-  ctx.fillStyle='#b09070';
-  ctx.beginPath(); ctx.moveTo(x+5*s,y-11*s); ctx.lineTo(x+10*s,y-19*s); ctx.lineTo(x+15*s,y-11*s); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(x+maat.w-5*s,y-11*s); ctx.lineTo(x+maat.w-10*s,y-19*s); ctx.lineTo(x+maat.w-15*s,y-11*s); ctx.fill();
-  ctx.fillStyle='#e8a090';
-  ctx.beginPath(); ctx.moveTo(x+7*s,y-12*s); ctx.lineTo(x+10*s,y-17*s); ctx.lineTo(x+13*s,y-12*s); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(x+maat.w-7*s,y-12*s); ctx.lineTo(x+maat.w-10*s,y-17*s); ctx.lineTo(x+maat.w-13*s,y-12*s); ctx.fill();
-  ctx.restore();
-  ctx.globalAlpha=1;
-}
-
-// ── EL RESTO DE FUNCIONES (updateGame, draw, etc.) permanecen igual, solo se reemplaza collect por meow
-function updateGame() { /* ... mismo código pero playSFX('meow') al recoger ... */ }
-// (Por brevedad, se mantiene la lógica, solo se cambia el sonido)
-// Aseguramos que al recoger ovillo se llame a playSFX('meow')
-// Integración en la función de update (dentro de la recolección)
-// Nota: en el código original se llamaba a playSFX('collect'), lo cambiamos:
-// Dentro del if (!yarnBall.collected) cuando se recoge: playSFX('meow');
-// Lo modificaremos en la versión final del script.
-// Ya que este es un mensaje extenso, incluiremos el resto del código funcional sin cambios mayores, solo ajuste de sonido.
-// A continuación el resto del script, pero por claridad se omiten partes repetitivas, pero en el entregable final estará completo.
-// He integrado los cambios esenciales, el archivo final contendrá todas las funciones completas.
-
-// ----------------------------------------------------------------------
-// El resto del código (updateGame, draw, UI, loop) es el mismo pero con el sonido meow.
-// Se adjunta el archivo completo funcionando en la respuesta final.
+  // Controles teclado y táctiles
+  window.addEventListener('keydown', e=>{ if(e.key==='ArrowLeft') keys.left=true; if(e.key==='ArrowRight') keys.right=true; if(e.key===' '||e.key==='ArrowUp'){ e.preventDefault(); jumpRequested=true; } });
+  window.addEventListener('keyup', e=>{ if(e.key==='ArrowLeft') keys.left=false; if(e.key==='ArrowRight') keys.right=false; });
+  const isMobile=/Mobi|Android|iPhone/i.test(navigator.userAgent);
+  if(isMobile) document.getElementById('touchControls').classList.add('active');
+  const bind=(id,down,up)=>{ let el=document.getElementById(id); el.addEventListener('touchstart',e=>{e.preventDefault(); down(); el.classList.add('pressed');},{passive:false}); el.addEventListener('touchend',e=>{e.preventDefault(); if(up)up(); el.classList.remove('pressed');}); el.addEventListener('mousedown',down); el.addEventListener('mouseup',up); };
+  bind('btnLeft',()=>keys.left=true,()=>keys.left=false); bind('btnRight',()=>keys.right=true,()=>keys.right=false); bind('btnJump',()=>jumpRequested=true,null);
+  resizeCanvas();
 </script>
 </body>
 </html>
