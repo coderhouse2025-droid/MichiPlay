@@ -560,9 +560,6 @@ function playSFX(type) {
     if (miau) {
       miau.currentTime = 0;
       miau.volume = 0.45;
-      
-miau.currentTime = 0;
-
       const playPromise = miau.play();
 
       if(playPromise !== undefined){
@@ -649,18 +646,6 @@ miau.currentTime = 0;
   }
 }
 
-
-
-function toggleMusic(){
-  musicOn = !musicOn;
-
-  if(musicOn){
-    initAudio();
-    startMusic();
-  }else{
-    stopMusic();
-  }
-}
 
 
 // ── THEME COLOR MANAGER ───────────────────────────────────
@@ -1425,18 +1410,12 @@ function showFloat(x,y,text) {
 function startGame() {
 
   initAudio();
+  if (audioCtx && audioCtx.state==='suspended') audioCtx.resume();
 
   const miau = document.getElementById('miauSound');
   if(miau){
     miau.load();
   }
-
-  if(musicOn){
-    startMusic();
-  }
-
-  initAudio();
-  if (audioCtx && audioCtx.state==='suspended') audioCtx.resume();
   score=0; lives=3; level=1; yarnsThisLevel=0;
   frameCount=0; levelClearing=false;
   particles=[]; shootingStars=[];
@@ -1486,23 +1465,22 @@ resize();
 
 
 function exitGame() {
-
-  gameStarted = false;
-  gameOver = true;
-
-  cancelAnimationFrame(animationId);
-
-  stopMusic();
+  gameRunning = false;
 
   const overlay = document.getElementById('overlay');
-  overlay.style.display = 'flex';
+  overlay.classList.remove('hidden');
 
   document.getElementById('overlayTitle').innerHTML = 'MAAT ASTRONAUTA';
 
   document.getElementById('overlaySub').innerHTML =
     '☆ Gata espacial en busca de ovillos ☆<br><br><span style="color:rgba(34,211,238,0.7)">← → mover · ↑ / espacio saltar</span>';
 
+  document.getElementById('overlayScore').style.display = 'none';
   document.getElementById('playBtn').innerHTML = '🚀 LANZAR MISIÓN';
+
+  stopSpaceMusic();
+  musicOn = false;
+  document.getElementById('musicBtn').textContent = '🔇';
 }
 
 
@@ -1512,10 +1490,14 @@ function toggleMusic(){
 
   if(musicOn){
     initAudio();
-    startMusic();
+    if (audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+    playSpaceMusic();
   }else{
-    stopMusic();
+    stopSpaceMusic();
   }
+  document.getElementById('musicBtn').textContent = musicOn ? '🔊' : '🔇';
+  const floatBtn = document.querySelector('.music-floating');
+  if (floatBtn) floatBtn.textContent = musicOn ? '♫' : '♪';
 }
 
 
