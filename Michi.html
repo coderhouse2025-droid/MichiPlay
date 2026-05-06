@@ -245,6 +245,77 @@
     content:''; position:fixed; inset:0; pointer-events:none; z-index:99;
     background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
   }
+
+/* ─────────────────────────────────────────
+   PANTALLA PRINCIPAL PRO
+───────────────────────────────────────── */
+
+.cover-title {
+  position: absolute;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Orbitron';
+  font-size: clamp(18px, 2vw, 28px);
+  color: white;
+  opacity: 0.9;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(255,255,255,0.2);
+}
+
+.hero-img {
+  width: 180px;
+  border-radius: 24px;
+  margin-bottom: 18px;
+  filter: drop-shadow(0 0 30px rgba(34,211,238,0.45));
+  animation: heroFloat 4s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.overlay-card {
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(34,211,238,0.25);
+  animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.btn-launch {
+  animation: glowPulse 2s infinite;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 10px rgba(34,211,238,0.4); }
+  50% { box-shadow: 0 0 35px rgba(124,58,237,0.8); }
+  100% { box-shadow: 0 0 10px rgba(34,211,238,0.4); }
+}
+
+.btn-launch:hover {
+  transform: translateY(-4px) scale(1.04);
+}
+
+body {
+  animation: bgMove 10s ease-in-out infinite alternate;
+}
+
+@keyframes bgMove {
+  from { background-position: 0 0; }
+  to { background-position: 0 30px; }
+}
+
 </style>
 </head>
 <body>
@@ -264,21 +335,42 @@
 
 <button id="musicBtn" title="Música" onclick="toggleMusic()">🎵</button>
 
+
 <div id="overlay">
   <div class="overlay-card">
+
     <div class="overlay-exit">EXIT</div>
-    <div class="overlay-icon">🐱🚀</div>
-    <div class="overlay-title" id="overlayTitle">MAAT ASTRONAUTA</div>
+
+    <div class="cover-title">🐾 UN DÍA, UNA MICHI</div>
+
+    <img src="Maat Astronauta.png" class="hero-img">
+
+    <div class="overlay-title" id="overlayTitle">
+      MAAT ASTRONAUTA
+    </div>
+
     <div class="overlay-sub" id="overlaySub">
       ☆ Gata espacial en busca de ovillos ☆<br><br>
-      <span style="color:rgba(34,211,238,0.7)">← → mover &nbsp;·&nbsp; ↑ / espacio saltar</span>
+      <span style="color:rgba(34,211,238,0.7)">
+        ← → mover · ↑ / espacio saltar
+      </span>
     </div>
+
     <div class="overlay-score-big" id="overlayScore" style="display:none"></div>
-    <button class="btn-launch" id="playBtn" onclick="startGame()">🚀 LANZAR MISIÓN</button>
+
+    <button class="btn-launch" id="playBtn" onclick="startGame()">
+      🚀 LANZAR MISIÓN
+    </button>
+
   </div>
 </div>
 
+<audio id="miauSound" preload="auto">
+  <source src="miau.mp3" type="audio/mpeg">
+</audio>
+
 <div id="touchControls">
+
   <div class="t-dpad">
     <div class="t-btn" id="btnLeft">◀</div>
     <div class="t-btn" id="btnRight">▶</div>
@@ -388,43 +480,100 @@ function stopSpaceMusic() {
   }, 1500);
 }
 
+
 function playSFX(type) {
   if (!audioCtx) return;
+
   const ctx2 = audioCtx;
+
   if (type === 'collect') {
+
+    const miau = document.getElementById('miauSound');
+
+    if (miau) {
+      miau.currentTime = 0;
+      miau.volume = 0.45;
+      miau.play().catch(()=>{});
+    }
+
     [880,1100,1320].forEach((f,i) => {
-      const o = ctx2.createOscillator(), g = ctx2.createGain();
-      o.type = 'sine'; o.frequency.value = f;
-      g.gain.value = 0.12; g.gain.setTargetAtTime(0, ctx2.currentTime + 0.05 + i*0.04, 0.05);
-      o.connect(g); g.connect(ctx2.destination);
+      const o = ctx2.createOscillator();
+      const g = ctx2.createGain();
+
+      o.type = 'sine';
+      o.frequency.value = f;
+
+      g.gain.value = 0.08;
+      g.gain.setTargetAtTime(0, ctx2.currentTime + 0.05 + i*0.04, 0.05);
+
+      o.connect(g);
+      g.connect(ctx2.destination);
+
       o.start(ctx2.currentTime + i * 0.06);
       o.stop(ctx2.currentTime + 0.3 + i * 0.06);
     });
-  } else if (type === 'hurt') {
-    const o = ctx2.createOscillator(), g = ctx2.createGain();
-    o.type = 'sawtooth'; o.frequency.value = 220;
+  }
+
+  else if (type === 'hurt') {
+
+    const o = ctx2.createOscillator();
+    const g = ctx2.createGain();
+
+    o.type = 'sawtooth';
+    o.frequency.value = 220;
     o.frequency.setTargetAtTime(55, ctx2.currentTime, 0.15);
-    g.gain.value = 0.15; g.gain.setTargetAtTime(0, ctx2.currentTime + 0.1, 0.1);
-    o.connect(g); g.connect(ctx2.destination);
-    o.start(); o.stop(ctx2.currentTime + 0.4);
-  } else if (type === 'jump') {
-    const o = ctx2.createOscillator(), g = ctx2.createGain();
-    o.type = 'sine'; o.frequency.value = 330;
-    o.frequency.setTargetAtTime(660, ctx2.currentTime, 0.08);
-    g.gain.value = 0.07; g.gain.setTargetAtTime(0, ctx2.currentTime + 0.05, 0.06);
-    o.connect(g); g.connect(ctx2.destination);
-    o.start(); o.stop(ctx2.currentTime + 0.2);
-  } else if (type === 'levelup') {
+
+    g.gain.value = 0.15;
+    g.gain.setTargetAtTime(0, ctx2.currentTime + 0.1, 0.1);
+
+    o.connect(g);
+    g.connect(ctx2.destination);
+
+    o.start();
+    o.stop(ctx2.currentTime + 0.4);
+  }
+
+  else if (type === 'jump') {
+
+    const o = ctx2.createOscillator();
+    const g = ctx2.createGain();
+
+    o.type = 'triangle';
+    o.frequency.value = 300;
+    o.frequency.setTargetAtTime(600, ctx2.currentTime, 0.08);
+
+    g.gain.value = 0.07;
+    g.gain.setTargetAtTime(0, ctx2.currentTime + 0.05, 0.06);
+
+    o.connect(g);
+    g.connect(ctx2.destination);
+
+    o.start();
+    o.stop(ctx2.currentTime + 0.2);
+  }
+
+  else if (type === 'levelup') {
+
     [523,659,784,1047].forEach((f,i) => {
-      const o = ctx2.createOscillator(), g = ctx2.createGain();
-      o.type = 'triangle'; o.frequency.value = f;
-      g.gain.value = 0.1; g.gain.setTargetAtTime(0, ctx2.currentTime + 0.15 + i*0.1, 0.08);
-      o.connect(g); g.connect(ctx2.destination);
+
+      const o = ctx2.createOscillator();
+      const g = ctx2.createGain();
+
+      o.type = 'triangle';
+      o.frequency.value = f;
+
+      g.gain.value = 0.1;
+      g.gain.setTargetAtTime(0, ctx2.currentTime + 0.15 + i*0.1, 0.08);
+
+      o.connect(g);
+      g.connect(ctx2.destination);
+
       o.start(ctx2.currentTime + i * 0.12);
       o.stop(ctx2.currentTime + 0.5 + i * 0.12);
     });
   }
 }
+
 
 function toggleMusic() {
   initAudio();
@@ -687,6 +836,7 @@ function spawnShootingStar() {
 
 // ── LOGIC ────────────────────────────────────────────────
 function updateGame() {
+  canvas.style.transform = `translateY(${Math.sin(frameCount * 0.01) * 2}px)`;
   frameCount++;
   if (frameCount % 180 === 0) spawnShootingStar();
 
@@ -765,6 +915,13 @@ function updateGame() {
       spawnCollectBurst(yarnBall.x, yarnBall.y);
       showFloat(yarnBall.x, yarnBall.y, '+1 🧶');
       playSFX('collect');
+
+      // flash visual
+      canvas.style.filter = 'brightness(1.25)';
+
+      setTimeout(() => {
+        canvas.style.filter = 'brightness(1)';
+      }, 90);
       if (score % 8 === 0 && lives < 5) {
         lives++; updateHUD(true);
         showFloat(maat.x, maat.y - 20*S, '❤️ +Vida');
@@ -876,6 +1033,10 @@ function drawSpace() {
   gGrad.addColorStop(1, currentTheme.groundDark);
   ctx.fillStyle = gGrad;
   ctx.fillRect(0,gy,W,13*S);
+
+  // brillo ambiental
+  ctx.fillStyle = 'rgba(255,255,255,0.015)';
+  ctx.fillRect(0,0,W,H);
   ctx.fillStyle = 'rgba(50,60,80,0.5)';
   for (const c of moonCraters) {
     ctx.beginPath(); ctx.ellipse(c.x,c.y,c.r,c.r*0.35,0,0,Math.PI*2); ctx.fill();
