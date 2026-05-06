@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>🐱🚀 Maat Astronauta · Misión Estable</title>
+  <title>🐱🚀 Maat Astronauta · Ovillos asegurados</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;700&display=swap');
 
@@ -53,7 +53,7 @@
     .hud-level { font-family: 'Orbitron', monospace; color: #22d3ee; }
     .hud-lives { letter-spacing: 3px; }
 
-    /* Botón EXIT rojo (siempre visible) */
+    /* Botón EXIT */
     #exitBtn {
       position: absolute;
       top: 14px;
@@ -94,7 +94,7 @@
       color: white;
     }
 
-    /* Overlay (presentación estilo imagen) */
+    /* Overlay */
     #overlay {
       position: absolute;
       inset: 0;
@@ -243,8 +243,7 @@
     // ---------- AUDIO ----------
     let audioCtx = null;
     let musicOn = false;
-    let musicLoopId = null;
-    let musicGain = null;
+    let musicInterval = null;
 
     function initAudio() {
       if (audioCtx) return;
@@ -301,10 +300,10 @@
     }
 
     function startMusic() {
-      if (!audioCtx || musicLoopId) return;
-      musicGain = audioCtx.createGain();
-      musicGain.gain.value = 0.3;
-      musicGain.connect(audioCtx.destination);
+      if (!audioCtx || musicInterval) return;
+      const master = audioCtx.createGain();
+      master.gain.value = 0.3;
+      master.connect(audioCtx.destination);
       const playChord = () => {
         if (!musicOn) return;
         const now = audioCtx.currentTime;
@@ -313,21 +312,17 @@
           const g = audioCtx.createGain();
           o.type = 'triangle'; o.frequency.value = f;
           g.gain.value = 0.05; g.gain.setTargetAtTime(0, now+3, 1);
-          o.connect(g); g.connect(musicGain);
+          o.connect(g); g.connect(master);
           o.start(); o.stop(now+3);
         });
       };
       playChord();
-      musicLoopId = setInterval(playChord, 5000);
+      musicInterval = setInterval(playChord, 5000);
     }
 
     function stopMusic() {
-      if (musicLoopId) clearInterval(musicLoopId);
-      musicLoopId = null;
-      if (musicGain) {
-        musicGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
-        setTimeout(() => { if(musicGain) musicGain.disconnect(); }, 500);
-      }
+      if (musicInterval) clearInterval(musicInterval);
+      musicInterval = null;
     }
 
     function toggleMusic() {
@@ -347,7 +342,7 @@
     let particles = [];
     let platforms = [];
     let hazards = [];
-    let yarnBall = null;
+    let yarnBall = null;      // será un objeto con x, y, r, collected, etc.
     let maat = null;
     let invincibleTimer = 0;
     let jumpRequested = false;
@@ -357,13 +352,14 @@
     let levelClearTimer = 0;
     let respawnTimeout = null;
 
-    const MAX_PARTICLES = 150;
+    const MAX_PARTICLES = 200;
 
     function getLevelCfg(lvl) {
       const b = lvl - 1;
       return { yarnsNeeded: 4 + b * 2, orbitLabel: ['ÓRBITA 1', 'LUNA', 'ASTEROIDE', 'NEBULOSA', 'ABISMO'][Math.min(b, 4)] };
     }
 
+    // Construir el nivel y asegurar que el ovillo aparece
     function buildLevel() {
       levelCfg = getLevelCfg(level);
       const ph = 13 * S;
@@ -374,7 +370,7 @@
         [0.20,0.38,0.10,ph],[0.46,0.36,0.10,ph],[0.68,0.40,0.09,ph]
       ];
       platforms = rawPlatforms.map(r => ({ x: r[0]*W, y: r[1]*H, w: r[2]*W, h: r[3] }));
-      platforms.push({ x:0, y:H+10, w:W, h:20 });
+      platforms.push({ x:0, y:H+10, w:W, h:20 }); // suelo mortal
 
       const rawHazards = [[0.27,0.805],[0.50,0.855],[0.72,0.825],[0.26,0.640],[0.64,0.650],[0.34,0.490],[0.77,0.535]];
       hazards = rawHazards.map(([rx,ry],i) => ({
@@ -385,9 +381,10 @@
         type: i % 3
       }));
 
-      // Inicializar personaje si no existe
       if (!maat) resetMaatPos();
-      respawnYarn();
+      // Forzar aparición de ovillo
+      if (respawnTimeout) clearTimeout(respawnTimeout);
+      respawnYarn(true); // True = forzar incluso si hay error
     }
 
     function resetMaatPos() {
@@ -399,17 +396,30 @@
       };
     }
 
-    function respawnYarn() {
+    function respawnYarn(force = false) {
+      if (!gameRunning && !force) return;
       if (respawnTimeout) clearTimeout(respawnTimeout);
-      if (!gameRunning) return;
-      const safe = platforms.filter(p => p.y < H*0.95);
-      if (safe.length === 0) return;
-      const p = safe[Math.floor(Math.random()*safe.length)];
-      let cx = p.x + p.w/2, cy = p.y - 11*S;
-      if (maat && Math.abs(maat.x - cx) < 40*S) cx = (cx + 100*S) % (W - 50*S);
+      // Buscar una plataforma segura (que no esté demasiado abajo)
+      let safePlatforms = platforms.filter(p => p.y < H*0.95 && p.w > 5);
+      if (safePlatforms.length === 0) safePlatforms = platforms.slice(); // fallback
+      if (safePlatforms.length === 0) {
+        // Si no hay plataformas, crear una temporal
+        yarnBall = { x: W/2, y: H/2, r: 9*S, collected: false, bob: 0, spin: 0 };
+        return;
+      }
+      const p = safePlatforms[Math.floor(Math.random() * safePlatforms.length)];
+      let cx = p.x + p.w/2;
+      let cy = p.y - 12*S;
+      // Evitar que aparezca encima de Maat
+      if (maat && Math.abs(maat.x - cx) < 40*S) {
+        cx = (cx + 80*S) % (W - 60*S);
+        if (cx < 20) cx = 20;
+      }
       yarnBall = {
         x: cx, y: cy, r: 9*S, collected: false,
-        bob: Math.random()*Math.PI*2, spin: 0
+        bob: Math.random() * Math.PI * 2,
+        spin: 0,
+        glow: 0
       };
     }
 
@@ -441,7 +451,6 @@
       maat.x += maat.vx;
       maat.y += maat.vy;
 
-      // Bordes
       if (maat.x < 0) { maat.x = 0; maat.vx = 0; }
       if (maat.x + maat.w > W) { maat.x = W - maat.w; maat.vx = 0; }
 
@@ -456,7 +465,6 @@
         }
       }
 
-      // Salto
       if (jumpRequested && maat.grounded) {
         maat.vy = maat.jumpPower;
         jumpRequested = false;
@@ -464,13 +472,11 @@
       }
       jumpRequested = false;
 
-      // Caída al vacío
       if (maat.y > H + 60) {
         hurtMaat();
         resetMaatPos();
       }
 
-      // Daño por obstáculos
       if (invincibleTimer <= 0) {
         for (let h of hazards) {
           if (maat.x+maat.w > h.x+4 && maat.x < h.x+h.w-4 &&
@@ -488,6 +494,7 @@
       if (yarnBall && !yarnBall.collected) {
         yarnBall.bob += 0.07;
         yarnBall.spin += 0.03;
+        yarnBall.glow = 0.5 + 0.5*Math.sin(frameCount*0.09);
         const dx = maat.x + maat.w/2 - yarnBall.x;
         const dy = maat.y + maat.h/2 - yarnBall.y;
         if (Math.hypot(dx, dy) < yarnBall.r + maat.w/2 - 4) {
@@ -515,7 +522,9 @@
             playSFX('levelup');
           } else {
             if (respawnTimeout) clearTimeout(respawnTimeout);
-            respawnTimeout = setTimeout(() => { if(gameRunning) respawnYarn(); }, 500);
+            respawnTimeout = setTimeout(() => {
+              if (gameRunning) respawnYarn();
+            }, 500);
           }
         }
       }
@@ -557,13 +566,12 @@
       stopMusic();
       document.getElementById('overlayTitle').innerText = '💀 MISIÓN FALLIDA';
       document.getElementById('overlaySub').innerHTML = 'Maat necesita descansar... ¿nuevo intento?';
-      const overlayCard = document.querySelector('.overlay-card');
       let scoreDiv = document.getElementById('overlayScore');
       if (!scoreDiv) {
         scoreDiv = document.createElement('div');
         scoreDiv.id = 'overlayScore';
         scoreDiv.className = 'overlay-score-big';
-        overlayCard.appendChild(scoreDiv);
+        document.querySelector('.overlay-card').appendChild(scoreDiv);
       }
       scoreDiv.style.display = 'block';
       scoreDiv.innerText = `🧶 Ovillos: ${score}  ·  ${levelCfg.orbitLabel}`;
@@ -596,10 +604,10 @@
       grad.addColorStop(1, '#0c1428');
       ctx.fillStyle = grad;
       ctx.fillRect(0,0,W,H);
-      // Estrellas simples
-      for (let i=0;i<200;i++) {
-        ctx.fillStyle = `rgba(255,240,180,${0.3+Math.sin(Date.now()*0.001+i)*0.2})`;
-        ctx.fillRect( (i*131)%W, (i*253)%H, 1, 1);
+      // Estrellas (fijas)
+      for (let i=0;i<250;i++) {
+        ctx.fillStyle = `rgba(255,240,180,${0.2+Math.sin(Date.now()*0.001+i)*0.15})`;
+        ctx.fillRect( (i*131)%W, (i*253)%H, 1.2, 1.2);
       }
       // Luna
       const mx = W*0.85, my = H*0.12, mr = 55*S;
@@ -614,6 +622,10 @@
       const gy = H - 13*S;
       ctx.fillStyle = '#7f8c9a';
       ctx.fillRect(0,gy,W,13*S);
+      for (let i=0;i<12;i++) {
+        ctx.fillStyle = 'rgba(60,70,90,0.4)';
+        ctx.beginPath(); ctx.ellipse(40*S + i*35*S, gy-3*S, 8*S, 3*S, 0, 0, Math.PI*2); ctx.fill();
+      }
 
       // Plataformas
       for (let p of platforms) {
@@ -622,6 +634,8 @@
         ctx.fillRect(p.x,p.y,p.w,p.h);
         ctx.fillStyle = '#c0d0e5';
         ctx.fillRect(p.x+3,p.y-2,p.w-6,4);
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        for (let i=0;i<3;i++) ctx.fillRect(p.x+8+i*15,p.y+4,3,p.h-7);
       }
 
       // Obstáculos
@@ -629,13 +643,29 @@
         const cx = h.x+h.w/2, cy = h.y+h.h/2;
         ctx.fillStyle = h.type===0 ? '#9b7653' : (h.type===1 ? '#5f9eff' : '#e34234');
         ctx.beginPath(); ctx.ellipse(cx,cy,h.w/2,h.h/2,0,0,Math.PI*2); ctx.fill();
+        if (h.type===1) {
+          ctx.fillStyle = '#fff';
+          ctx.beginPath(); ctx.arc(cx-h.w*0.2,cy-h.h*0.2, h.w*0.18,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(cx+h.w*0.2,cy-h.h*0.2, h.w*0.18,0,Math.PI*2); ctx.fill();
+        }
+        if (h.type===2) {
+          for (let i=0;i<6;i++) {
+            const ang = i*Math.PI*2/6;
+            ctx.beginPath();
+            ctx.moveTo(cx+Math.cos(ang)*h.w/2, cy+Math.sin(ang)*h.h/2);
+            ctx.lineTo(cx+Math.cos(ang)*h.w*0.85, cy+Math.sin(ang)*h.h*0.85);
+            ctx.strokeStyle = '#ffaa66';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+        }
       }
 
-      // Ovillo
+      // Ovillo (si existe y no recogido)
       if (yarnBall && !yarnBall.collected) {
         const bx = yarnBall.x, by = yarnBall.y + Math.sin(yarnBall.bob)*5*S;
+        ctx.shadowBlur = 15 * (yarnBall.glow || 0.5);
         ctx.fillStyle = '#c084fc';
-        ctx.shadowBlur = 15;
         ctx.beginPath(); ctx.arc(bx,by,yarnBall.r,0,Math.PI*2); ctx.fill();
         ctx.shadowBlur = 0;
         ctx.save(); ctx.translate(bx,by); ctx.rotate(yarnBall.spin);
@@ -644,6 +674,12 @@
           ctx.beginPath(); ctx.ellipse(Math.cos(i*Math.PI/2)*yarnBall.r*0.4, Math.sin(i*Math.PI/2)*yarnBall.r*0.4, yarnBall.r*0.55,yarnBall.r*0.3, i*Math.PI/2,0,Math.PI*2); ctx.fill();
         }
         ctx.restore();
+      } else if (!yarnBall || (yarnBall.collected && !levelClearing)) {
+        // Si por algún motivo no hay ovillo, regenerar inmediatamente
+        if (gameRunning && !levelClearing && (!yarnBall || yarnBall.collected)) {
+          if (respawnTimeout) clearTimeout(respawnTimeout);
+          respawnYarn(true);
+        }
       }
 
       // Partículas
@@ -654,7 +690,7 @@
       }
       ctx.globalAlpha = 1;
 
-      // Gata Maat (con parches)
+      // Gata Maat
       drawMaat();
 
       // Barra de progreso
@@ -686,14 +722,14 @@
       ctx.beginPath(); ctx.ellipse(x+maat.w/2, y+maat.h*0.6, maat.w/2-2, maat.h*0.38, 0, 0, Math.PI*2); ctx.fill();
       ctx.fillStyle = '#f97316';
       ctx.fillRect(x+6*s, y+maat.h*0.45, maat.w-12*s, 4*s);
-      // Bandera Argentina (parche izquierdo)
+      // Parche bandera argentina
       ctx.save(); ctx.translate(x+maat.w*0.28, y+maat.h*0.62); ctx.scale(0.65,0.65);
       ctx.fillStyle = '#74ACDF'; ctx.fillRect(-12,-8,24,5);
       ctx.fillStyle = '#FFFFFF'; ctx.fillRect(-12,-3,24,5);
       ctx.fillStyle = '#74ACDF'; ctx.fillRect(-12,2,24,5);
       ctx.fillStyle = '#FFD966'; ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2); ctx.fill();
       ctx.restore();
-      // Huella de pata (parche derecho)
+      // Parche huella
       ctx.save(); ctx.translate(x+maat.w*0.72, y+maat.h*0.62); ctx.fillStyle = '#f59e0b';
       ctx.beginPath(); ctx.ellipse(0,0,5,4,0,0,Math.PI*2); ctx.fill();
       for (let i=-1;i<=1;i++) { ctx.beginPath(); ctx.ellipse(i*6,-4,2.5,3,0,0,Math.PI*2); ctx.fill(); }
@@ -714,6 +750,8 @@
       visGrad.addColorStop(1, 'rgba(14,68,180,0.45)');
       ctx.fillStyle = visGrad;
       ctx.beginPath(); ctx.arc(x+maat.w/2, y-2*s, 11*s, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.beginPath(); ctx.ellipse(x+maat.w/2-3*s, y-8*s, 4*s, 2.5*s, -0.5, 0, Math.PI*2); ctx.fill();
       // Cara de gato
       ctx.fillStyle = '#b09070';
       ctx.beginPath(); ctx.arc(x+maat.w/2, y-2*s, 8.5*s, 0, Math.PI*2); ctx.fill();
@@ -743,19 +781,16 @@
         animationId = requestAnimationFrame(gameLoop);
       } catch(e) {
         console.error(e);
-        // Si ocurre un error, intentamos continuar
         animationId = requestAnimationFrame(gameLoop);
       }
     }
 
-    // ---------- INICIO Y REINICIO ----------
+    // ---------- INICIO DEL JUEGO ----------
     function startGame() {
-      // Detener todo lo anterior
       if (animationId) cancelAnimationFrame(animationId);
       if (respawnTimeout) clearTimeout(respawnTimeout);
-      if (musicLoopId) clearInterval(musicLoopId);
       gameRunning = false;
-      // Resetear estado
+      // Resetear todo
       score = 0;
       lives = 3;
       level = 1;
@@ -766,9 +801,9 @@
       levelClearing = false;
       keys = { left: false, right: false };
       jumpRequested = false;
-      // Inicializar canvas y dimensiones
+      // Ajustar tamaño y construir mundo
       resizeCanvas();
-      buildLevel();
+      buildLevel();      // esto crea plataformas, obstáculos, y llama a respawnYarn()
       updateHUD();
       // Ocultar overlay
       document.getElementById('overlay').classList.add('hidden');
@@ -791,7 +826,7 @@
       if (respawnTimeout) clearTimeout(respawnTimeout);
       stopMusic();
       document.getElementById('overlayTitle').innerText = '🚪 MISIÓN ABORTADA';
-      document.getElementById('overlaySub').innerHTML = 'Volviste a la base. ¡Prepárate!';
+      document.getElementById('overlaySub').innerHTML = 'Volviste a la base. ¡Prepárate para el próximo despegue!';
       let scoreDiv = document.getElementById('overlayScore');
       if (!scoreDiv) {
         scoreDiv = document.createElement('div');
@@ -831,7 +866,6 @@
       if (e.key === 'ArrowRight') keys.right = false;
     });
 
-    // Controles táctiles
     const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
     if (isMobile) document.getElementById('touchControls').classList.add('active');
     const bindTouch = (id, down, up) => {
@@ -846,7 +880,6 @@
     bindTouch('btnRight', () => { if(gameRunning) keys.right = true; }, () => { if(gameRunning) keys.right = false; });
     bindTouch('btnJump', () => { if(gameRunning) jumpRequested = true; }, null);
 
-    // Botones UI
     document.getElementById('exitBtn').addEventListener('click', exitGame);
     document.getElementById('musicBtn').addEventListener('click', toggleMusic);
     document.getElementById('launchBtn').addEventListener('click', startGame);
