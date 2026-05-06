@@ -1,4 +1,5 @@
-# 🐱🚀 Maat Astronauta
+# <img width="1254" height="1254" alt="file_0000000033d071fb83fe2cc3f968fecc" src="https://github.com/user-attachments/assets/5d88247e-0205-4ac1-a31e-41320c9be34c" />
+🚀 Maat Astronauta
 
 <div align="center">
 
