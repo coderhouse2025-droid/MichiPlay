@@ -95,6 +95,7 @@ El proyecto evolucionó desde una versión original más simple hasta esta versi
 
 ---
 👤 Autor
+
 Juan Manuel Orellana
 
 ---
