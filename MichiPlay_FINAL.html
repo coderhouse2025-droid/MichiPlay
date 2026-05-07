@@ -248,19 +248,19 @@
 
   /* EXIT button next to music */
   #inGameExitBtn {
-    position: absolute; top: 14px; right: 70px;
+    position: absolute; top: 14px; right: 75px;
     z-index: 25; pointer-events: all;
     background: rgba(255,59,48,0.85);
     border: 1px solid rgba(255,100,90,0.5);
     border-radius: 50px;
-    width: 42px; height: 42px;
-    display: none;
-    align-items: center; justify-content: center;
-    font-size: 16px; cursor: pointer;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 0 14px rgba(255,59,48,.4);
     color: white;
     font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 0 14px rgba(255,59,48,.4);
+    backdrop-filter: blur(8px);
+    padding: 6px 18px;
+    display: none;
   }
 
   /* scanline effect */
@@ -293,7 +293,6 @@
   margin-top: 30px; /* Bajar imagen para no tapar título */
   filter: drop-shadow(0 0 30px rgba(34,211,238,0.45));
   animation: heroFloat 4s ease-in-out infinite;
-  mix-blend-mode: screen; /* Para eliminar bordes negros */
   background: transparent;
 }
 
@@ -411,13 +410,17 @@ body {
   padding:16px 24px!important;
 }
 
+#overlayExitBtn {
+  width: 85% !important;
+}
+
 
   /* ── RESPONSIVE MOBILE ── */
   @media (max-width: 600px) {
     #hud { padding: 8px 10px; }
     .hud-pill { padding: 5px 10px; gap: 6px; }
     #musicBtn { width: 36px; height: 36px; font-size: 16px; top: 10px; right: 10px; }
-    #inGameExitBtn { width: 36px; height: 36px; font-size: 14px; top: 10px; right: 55px; }
+    #inGameExitBtn { font-size: 12px; padding: 4px 12px; top: 10px; right: 55px; }
     .t-btn { width: 56px; height: 56px; font-size: 20px; }
     .t-jump { width: 70px; height: 70px; font-size: 24px; }
     .t-dpad { bottom: 14px; left: 10px; gap: 8px; }
@@ -450,10 +453,12 @@ body {
 </div>
 
 <!-- In-game EXIT button moved next to music -->
-<button id="inGameExitBtn" onclick="exitGame()">✕</button>
+<button id="inGameExitBtn" onclick="exitGame()">Exit</button>
 
 <button id="musicBtn" title="Música" onclick="toggleMusic()">🎵</button>
 
+<!-- Audio de fondo (archivo externo) -->
+<audio id="bgMusic" loop src="musica espacial.mpeg"></audio>
 
 <div id="overlay">
   <div class="overlay-card">
@@ -464,7 +469,7 @@ body {
 
     <div class="cover-title">🐾 UN DÍA, UNA MICHI</div>
 
-    <img src="data:image/png;base64,UklGRsQTAQBXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YaAT..." class="hero-img">
+    <img src="Maat_astronauta.png" class="hero-img">
 
     <div class="overlay-title" id="overlayTitle">
       MAAT ASTRONAUTA
@@ -497,8 +502,7 @@ body {
       color:rgba(255,120,110,0.9);
       box-shadow:0 0 14px rgba(255,59,48,0.2);
       pointer-events:all;
-      width:85%;
-    ">✕ EXIT</button>
+    ">EXIT</button>
 
   </div>
 </div>
@@ -527,147 +531,30 @@ const ctx = canvas.getContext('2d');
 
 let W, H, S; // S = scale factor
 
-// ── AUDIO ENGINE ──────────────────────────────────────────
-let audioCtx = null, musicOn = false, musicNodes = {};
-
+// ── AUDIO ENGINE (SFX) ──────────────────────────────────
+let audioCtx = null;
 function initAudio() {
   if (audioCtx) return;
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
 
+// Música de fondo con archivo externo
+let musicOn = false;
+const bgMusic = document.getElementById('bgMusic');
+
 function playSpaceMusic() {
-  if (!audioCtx || musicNodes.master) return;
-  const master = audioCtx.createGain();
-  master.gain.value = 0.35;
-  master.connect(audioCtx.destination);
-  musicNodes.master = master;
-
-  // Mejor música: drones más ricos, línea de bajo y melodía ambiental
-  function makeDrone(freq, vol, type='sine') {
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = type;
-    osc.frequency.value = freq;
-    g.gain.value = vol;
-    const filter = audioCtx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 800;
-    osc.connect(filter);
-    filter.connect(g);
-    g.connect(master);
-    osc.start();
-    return { osc, g };
+  if (!bgMusic) return;
+  bgMusic.volume = 0.35;
+  const playPromise = bgMusic.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(err => console.log("Error reproduciendo música de fondo:", err));
   }
-
-  // Acordes espaciales épicos
-  const chords = [
-    [110, 138.6, 164.8, 220],
-    [98,  123.5, 146.8, 196],
-    [130.8, 164.8, 196, 261.6],
-    [110, 138.6, 164.8, 220],
-    [82.4, 110, 130.8, 164.8],
-  ];
-  let chordIdx = 0;
-  const padOscs = [];
-
-  function playChord() {
-    padOscs.forEach(n => {
-      n.g.gain.setTargetAtTime(0, audioCtx.currentTime, 1.5);
-      setTimeout(() => { try { n.osc.stop(); } catch(e){} }, 4000);
-    });
-    padOscs.length = 0;
-    const chord = chords[chordIdx % chords.length];
-    chord.forEach((f, i) => {
-      const osc = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      const filter = audioCtx.createBiquadFilter();
-      osc.type = i === 0 ? 'triangle' : 'sine';
-      osc.frequency.value = f;
-      filter.type = 'lowpass';
-      filter.frequency.value = 1200;
-      g.gain.value = 0;
-      g.gain.setTargetAtTime(0.08 / (i + 1), audioCtx.currentTime, 1.2);
-      osc.connect(filter); filter.connect(g); g.connect(master);
-      osc.start();
-      padOscs.push({ osc, g });
-    });
-    chordIdx++;
-  }
-
-  playChord();
-  musicNodes.chordInterval = setInterval(playChord, 6000);
-
-  // Línea de bajo pulsante
-  const bassOsc = audioCtx.createOscillator();
-  const bassGain = audioCtx.createGain();
-  bassOsc.type = 'sine';
-  bassOsc.frequency.value = 55;
-  bassGain.gain.value = 0.1;
-  const bassFilter = audioCtx.createBiquadFilter();
-  bassFilter.type = 'lowpass';
-  bassFilter.frequency.value = 400;
-  bassOsc.connect(bassFilter);
-  bassFilter.connect(bassGain);
-  bassGain.connect(master);
-  bassOsc.start();
-  musicNodes.bassOsc = bassOsc;
-
-  // Melodía ambiental aleatoria
-  function spaceMelody() {
-    const notes = [220, 261.6, 329.6, 392, 440, 523.2, 587.3, 659.2];
-    const osc = audioCtx.createOscillator();
-    const env = audioCtx.createGain();
-    osc.type = 'sine';
-    const freq = notes[Math.floor(Math.random() * notes.length)];
-    osc.frequency.value = freq;
-    env.gain.value = 0;
-    env.gain.setTargetAtTime(0.06, audioCtx.currentTime, 0.05);
-    env.gain.setTargetAtTime(0, audioCtx.currentTime + 0.3, 0.1);
-    const filter = audioCtx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 1500;
-    osc.connect(filter);
-    filter.connect(env);
-    env.connect(master);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.8);
-    const delay = 2000 + Math.random() * 4000;
-    musicNodes.melodyTimeout = setTimeout(spaceMelody, delay);
-  }
-  spaceMelody();
-
-  // Efectos espaciales
-  function spaceBlip() {
-    const osc = audioCtx.createOscillator();
-    const env = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = 880 + Math.random() * 440;
-    osc.frequency.setTargetAtTime(220, audioCtx.currentTime, 0.1);
-    env.gain.value = 0.08;
-    env.gain.setTargetAtTime(0, audioCtx.currentTime + 0.02, 0.08);
-    osc.connect(env); env.connect(master);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.3);
-    const delay = 1200 + Math.random() * 2800;
-    musicNodes.blipTimeout = setTimeout(spaceBlip, delay);
-  }
-  spaceBlip();
-
-  makeDrone(55, 0.12, 'triangle');
-  makeDrone(82.4, 0.06, 'sine');
 }
 
 function stopSpaceMusic() {
-  if (!musicNodes.master) return;
-  clearInterval(musicNodes.chordInterval);
-  clearTimeout(musicNodes.blipTimeout);
-  clearTimeout(musicNodes.melodyTimeout);
-  if (musicNodes.bassOsc) { try { musicNodes.bassOsc.stop(); } catch(e) {} }
-  musicNodes.master.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
-  setTimeout(() => {
-    try { musicNodes.master.disconnect(); } catch(e) {}
-    musicNodes = {};
-  }, 1500);
+  if (!bgMusic) return;
+  bgMusic.pause();
+  bgMusic.currentTime = 0;
 }
 
 
@@ -677,92 +564,68 @@ function playSFX(type) {
   const ctx2 = audioCtx;
 
   if (type === 'collect') {
-
     const miau = document.getElementById('miauSound');
-
     if (miau) {
       miau.currentTime = 0;
       miau.volume = 0.45;
       const playPromise = miau.play();
-
       if(playPromise !== undefined){
         playPromise.catch(err=>console.log(err));
       }
-
     }
 
     [880,1100,1320].forEach((f,i) => {
       const o = ctx2.createOscillator();
       const g = ctx2.createGain();
-
       o.type = 'sine';
       o.frequency.value = f;
-
       g.gain.value = 0.08;
       g.gain.setTargetAtTime(0, ctx2.currentTime + 0.05 + i*0.04, 0.05);
-
       o.connect(g);
       g.connect(ctx2.destination);
-
       o.start(ctx2.currentTime + i * 0.06);
       o.stop(ctx2.currentTime + 0.3 + i * 0.06);
     });
   }
 
   else if (type === 'hurt') {
-
     const o = ctx2.createOscillator();
     const g = ctx2.createGain();
-
     o.type = 'sawtooth';
     o.frequency.value = 220;
     o.frequency.setTargetAtTime(55, ctx2.currentTime, 0.15);
-
     g.gain.value = 0.15;
     g.gain.setTargetAtTime(0, ctx2.currentTime + 0.1, 0.1);
-
     o.connect(g);
     g.connect(ctx2.destination);
-
     o.start();
     o.stop(ctx2.currentTime + 0.4);
   }
 
   else if (type === 'jump') {
-
     const o = ctx2.createOscillator();
     const g = ctx2.createGain();
-
     o.type = 'triangle';
     o.frequency.value = 300;
     o.frequency.setTargetAtTime(600, ctx2.currentTime, 0.08);
-
     g.gain.value = 0.07;
     g.gain.setTargetAtTime(0, ctx2.currentTime + 0.05, 0.06);
-
     o.connect(g);
     g.connect(ctx2.destination);
-
     o.start();
     o.stop(ctx2.currentTime + 0.2);
   }
 
   else if (type === 'levelup') {
-
     [523,659,784,1047].forEach((f,i) => {
-
       const o = ctx2.createOscillator();
       const g = ctx2.createGain();
-
       o.type = 'triangle';
       o.frequency.value = f;
-
       g.gain.value = 0.1;
       g.gain.setTargetAtTime(0, ctx2.currentTime + 0.15 + i*0.1, 0.08);
-
       o.connect(g);
       g.connect(ctx2.destination);
-
       o.start(ctx2.currentTime + i * 0.12);
       o.stop(ctx2.currentTime + 0.5 + i * 0.12);
     });
@@ -821,7 +684,6 @@ function applyTheme(level) {
   const theme = themes[Math.min(level, 5)] || themes[1];
   currentTheme = theme;
   
-  // Update HUD accent colors
   document.querySelectorAll('.hud-pill').forEach(el => {
     el.style.borderColor = theme.accent + '44';
     el.style.boxShadow = `0 0 20px ${theme.accent}22, inset 0 1px 0 rgba(255,255,255,0.08)`;
@@ -829,19 +691,15 @@ function applyTheme(level) {
   document.getElementById('levelDisplay').style.color = theme.accent;
   document.getElementById('levelDisplay').style.textShadow = `0 0 10px ${theme.accent}88`;
   
-  // Update button
   const btn = document.querySelector('.btn-launch');
   if (btn) btn.style.background = `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`;
   
-  // Update overlay card border
   const card = document.querySelector('.overlay-card');
   if (card) card.style.borderColor = theme.accent + '44';
   
-  // Update music button border
   const musicBtn = document.getElementById('musicBtn');
   if (musicBtn) musicBtn.style.borderColor = theme.accent + '44';
   
-  // Update touch controls
   document.querySelectorAll('.t-btn').forEach(el => {
     el.style.borderColor = theme.accent + '44';
     el.style.color = theme.accent;
@@ -933,7 +791,6 @@ function rebuildLevel() {
   platforms = raw.map(([rx,ry,rw,rh]) => ({ x:rx*W, y:ry*H, w:rw*W, h:rh }));
   platforms.push({ x:0, y:H+10, w:W, h:20 });
 
-  // Aliens instead of old hazards
   const rawH = [
     [0.27,0.805],[0.50,0.855],[0.72,0.825],
     [0.26,0.640],[0.64,0.650],
@@ -946,7 +803,7 @@ function rebuildLevel() {
       baseX: rx*W, dir: i%2===0 ? 1 : -1,
       speed: levelCfg.hazardSpeed * (0.7 + i*0.15),
       range: 22*S,
-      alienType: i % 3 // 0=green, 1=purple, 2=red alien
+      alienType: i % 3
     };
   });
 
@@ -1045,7 +902,6 @@ function updateGame() {
     spaceshipY = H + 100*S - (winTimer * 2*S);
     if (spaceshipY < H*0.4) spaceshipY = H*0.4;
     if (winTimer > 200) {
-      // Show final overlay
       gameRunning = false;
       document.getElementById('overlay').classList.remove('hidden');
       document.getElementById('overlayTitle').textContent = '🐱 MISIÓN CUMPLIDA 🚀';
@@ -1066,7 +922,6 @@ function updateGame() {
     levelClearTimer--;
     if (levelClearTimer <= 0) {
       if (level === 5 && score >= TOTAL_YARNS_FOR_WIN) {
-        // ¡Victoria final!
         levelClearing = false;
         gameWinning = true;
         winTimer = 0;
@@ -1140,19 +995,15 @@ function updateGame() {
       showFloat(yarnBall.x, yarnBall.y, '+1 🧶');
       playSFX('collect');
 
-      // flash visual
       canvas.style.filter = 'brightness(1.25)';
+      setTimeout(() => { canvas.style.filter = 'brightness(1)'; }, 90);
 
-      setTimeout(() => {
-        canvas.style.filter = 'brightness(1)';
-      }, 90);
       if (score % 8 === 0 && lives < 5) {
         lives++; updateHUD(true);
         showFloat(maat.x, maat.y - 20*S, '❤️ +Vida');
       }
       if (yarnsThisLevel >= levelCfg.yarnsNeeded) {
         if (level === 5 && score >= TOTAL_YARNS_FOR_WIN) {
-          // Victoria final: activar secuencia
           levelClearing = true; levelClearTimer = 120;
           showFloat(W/2, H/2, '🌟 ¡ABISMO SUPERADO!');
           playSFX('levelup');
@@ -1202,9 +1053,7 @@ function draw() {
   drawParticles();
   drawMaat();
   drawProgressBar();
-  if (gameWinning) {
-    drawSpaceship();
-  }
+  if (gameWinning) drawSpaceship();
 }
 
 function drawSpace() {
@@ -1268,7 +1117,6 @@ function drawSpace() {
   ctx.fillStyle = gGrad;
   ctx.fillRect(0,gy,W,13*S);
 
-  // brillo ambiental
   ctx.fillStyle = 'rgba(255,255,255,0.015)';
   ctx.fillRect(0,0,W,H);
   ctx.fillStyle = 'rgba(50,60,80,0.5)';
@@ -1299,71 +1147,49 @@ function drawPlatforms() {
 }
 
 function drawHazards() {
-  for (const h of hazards) {
-    drawAlien(h);
-  }
+  for (const h of hazards) drawAlien(h);
 }
 
 function drawAlien(h) {
-  const cx = h.x + h.w/2, cy = h.y + h.h/2;
-  const s = S;
+  const cx = h.x + h.w/2, cy = h.y + h.h/2, s = S;
   ctx.save();
   ctx.translate(cx, cy);
   
-  // Colors based on alien type
   let bodyColor, eyeColor, antennaColor, glowColor;
-  if (h.alienType === 0) { // Green alien
+  if (h.alienType === 0) {
     bodyColor = '#4ade80'; eyeColor = '#facc15'; antennaColor = '#22c55e'; glowColor = 'rgba(74,222,128,0.5)';
-  } else if (h.alienType === 1) { // Purple alien
+  } else if (h.alienType === 1) {
     bodyColor = '#c084fc'; eyeColor = '#f472b6'; antennaColor = '#a855f7'; glowColor = 'rgba(192,132,252,0.5)';
-  } else { // Red alien
+  } else {
     bodyColor = '#f87171'; eyeColor = '#fbbf24'; antennaColor = '#ef4444'; glowColor = 'rgba(248,113,113,0.5)';
   }
 
   ctx.shadowBlur = 12*s; ctx.shadowColor = glowColor;
-  
-  // Body (oval)
   ctx.fillStyle = bodyColor;
   ctx.beginPath();
   ctx.ellipse(0, 0, h.w/2 - 1, h.h/2 - 1, 0, 0, Math.PI*2);
   ctx.fill();
-  
-  // Lighter belly
   ctx.fillStyle = 'rgba(255,255,255,0.25)';
   ctx.beginPath();
   ctx.ellipse(0, 2*s, h.w*0.35, h.h*0.35, 0, 0, Math.PI*2);
   ctx.fill();
-  
   ctx.shadowBlur = 0;
-  
-  // Eyes (big alien eyes)
-  const eyeXOffset = h.w * 0.25;
-  const eyeY = -h.h * 0.15;
-  const eyeR = h.w * 0.28;
-  
-  // Eye whites
+
+  const eyeXOffset = h.w * 0.25, eyeY = -h.h * 0.15, eyeR = h.w * 0.28;
   ctx.fillStyle = '#fff';
   ctx.beginPath(); ctx.arc(-eyeXOffset, eyeY, eyeR, 0, Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.arc(eyeXOffset, eyeY, eyeR, 0, Math.PI*2); ctx.fill();
-  
-  // Pupils (slit/cat-like or round)
   ctx.fillStyle = '#1a1a1a';
   ctx.beginPath(); ctx.ellipse(-eyeXOffset, eyeY, eyeR*0.45, eyeR*0.7, 0, 0, Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.ellipse(eyeXOffset, eyeY, eyeR*0.45, eyeR*0.7, 0, 0, Math.PI*2); ctx.fill();
-  
-  // Eye shine
   ctx.fillStyle = 'rgba(255,255,255,0.8)';
   ctx.beginPath(); ctx.arc(-eyeXOffset - eyeR*0.2, eyeY - eyeR*0.3, eyeR*0.25, 0, Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.arc(eyeXOffset - eyeR*0.2, eyeY - eyeR*0.3, eyeR*0.25, 0, Math.PI*2); ctx.fill();
-  
-  // Antennae
+
   ctx.strokeStyle = antennaColor;
   ctx.lineWidth = 2*s;
   ctx.lineCap = 'round';
-  const antennaBase = -h.h * 0.45;
-  const antennaTip = -h.h * 0.8;
-  const antennaSpread = h.w * 0.3;
-  
+  const antennaBase = -h.h * 0.45, antennaTip = -h.h * 0.8, antennaSpread = h.w * 0.3;
   ctx.beginPath();
   ctx.moveTo(-antennaSpread*0.4, antennaBase);
   ctx.quadraticCurveTo(-antennaSpread, antennaBase - 10*s, -antennaSpread*1.2, antennaTip);
@@ -1372,22 +1198,18 @@ function drawAlien(h) {
   ctx.moveTo(antennaSpread*0.4, antennaBase);
   ctx.quadraticCurveTo(antennaSpread, antennaBase - 10*s, antennaSpread*1.2, antennaTip);
   ctx.stroke();
-  
-  // Antenna bulbs
   ctx.fillStyle = eyeColor;
   ctx.shadowBlur = 6*s; ctx.shadowColor = eyeColor;
   ctx.beginPath(); ctx.arc(-antennaSpread*1.2, antennaTip, 3*s, 0, Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.arc(antennaSpread*1.2, antennaTip, 3*s, 0, Math.PI*2); ctx.fill();
   ctx.shadowBlur = 0;
-  
-  // Small mouth
+
   ctx.strokeStyle = '#1a1a1a';
   ctx.lineWidth = 1.5*s;
   ctx.beginPath();
   ctx.arc(0, eyeY + eyeR + 3*s, 4*s, 0.1, Math.PI - 0.1);
   ctx.stroke();
-  
-  // Little arms/legs (floating)
+
   ctx.fillStyle = bodyColor;
   ctx.shadowBlur = 4*s; ctx.shadowColor = glowColor;
   const armY = h.h * 0.2;
@@ -1564,10 +1386,8 @@ function drawSpaceship() {
   ctx.save();
   ctx.translate(shipX, shipY);
   
-  // Nave espacial estilizada
   ctx.shadowBlur = 20*s; ctx.shadowColor = 'rgba(255,215,0,0.6)';
   
-  // Cuerpo principal
   ctx.fillStyle = '#e0e7ff';
   ctx.beginPath();
   ctx.moveTo(0, -40*s);
@@ -1578,7 +1398,6 @@ function drawSpaceship() {
   ctx.closePath();
   ctx.fill();
   
-  // Ventana
   ctx.fillStyle = '#60a5fa';
   ctx.beginPath();
   ctx.arc(0, -5*s, 10*s, 0, Math.PI*2);
@@ -1588,7 +1407,6 @@ function drawSpaceship() {
   ctx.arc(-3*s, -8*s, 3*s, 0, Math.PI*2);
   ctx.fill();
   
-  // Alas
   ctx.fillStyle = '#93c5fd';
   ctx.beginPath();
   ctx.moveTo(-25*s, 20*s);
@@ -1603,7 +1421,6 @@ function drawSpaceship() {
   ctx.closePath();
   ctx.fill();
   
-  // Propulsores
   ctx.fillStyle = '#fbbf24';
   ctx.beginPath();
   ctx.ellipse(-10*s, 35*s, 6*s, 10*s, 0, 0, Math.PI*2);
@@ -1612,7 +1429,6 @@ function drawSpaceship() {
   ctx.ellipse(10*s, 35*s, 6*s, 10*s, 0, 0, Math.PI*2);
   ctx.fill();
   
-  // Llama
   const flameGrad = ctx.createLinearGradient(0, 35*s, 0, 55*s);
   flameGrad.addColorStop(0, '#fbbf24');
   flameGrad.addColorStop(0.5, '#f97316');
@@ -1628,14 +1444,12 @@ function drawSpaceship() {
   ctx.shadowBlur = 0;
   ctx.restore();
   
-  // Maat subiendo a la nave (cuando la nave está baja)
   if (spaceshipY < H*0.6) {
     const maatX = shipX - 30*s;
     const maatY = shipY + 20*s;
     ctx.save();
     ctx.translate(maatX, maatY);
     ctx.scale(0.7, 0.7);
-    // Dibujar Maat simplificado
     ctx.fillStyle = currentTheme.suit;
     ctx.beginPath();
     ctx.ellipse(0, 0, 12*s, 15*s, 0, 0, Math.PI*2);
@@ -1644,7 +1458,6 @@ function drawSpaceship() {
     ctx.beginPath();
     ctx.arc(0, -10*s, 8*s, 0, Math.PI*2);
     ctx.fill();
-    // Ojos
     ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.arc(-4*s, -12*s, 3*s, 0, Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(4*s, -12*s, 3*s, 0, Math.PI*2); ctx.fill();
@@ -1654,7 +1467,6 @@ function drawSpaceship() {
     ctx.restore();
   }
   
-  // Texto "Michi Misión Cumplida" cuando la nave ha bajado
   if (winTimer > 100) {
     ctx.fillStyle = '#fff';
     ctx.font = `bold ${Math.min(24*S, 48)}px 'Orbitron'`;
@@ -1687,7 +1499,6 @@ function showFloat(x,y,text) {
 // ── START / END ──────────────────────────────────────────
 
 function startGame() {
-
   initAudio();
   if (audioCtx && audioCtx.state==='suspended') audioCtx.resume();
 
@@ -1704,11 +1515,11 @@ function startGame() {
   resetMaatPos();
   updateHUD();
   document.getElementById('overlay').classList.add('hidden');
-  document.getElementById('inGameExitBtn').style.display='flex';
+  document.getElementById('inGameExitBtn').style.display='block';
   document.getElementById('overlayExitBtn').style.display='none';
   musicOn=true;
   document.getElementById('musicBtn').textContent='🔊';
-  setTimeout(()=>{ if(musicOn) playSpaceMusic(); },300);
+  playSpaceMusic();
   loop();
 }
 
@@ -1723,6 +1534,9 @@ function endGame() {
   sc.textContent=`🧶 Ovillos: ${score}  ·  ${levelCfg.orbitLabel||'Órbita 1'}`;
   document.querySelector('.btn-launch').textContent='🚀 NUEVA MISIÓN';
   document.getElementById('overlay').classList.remove('hidden');
+  stopSpaceMusic();
+  musicOn = false;
+  document.getElementById('musicBtn').textContent = '🔇';
 }
 
 // ── LOOP ─────────────────────────────────────────────────
@@ -1746,7 +1560,6 @@ function roundRect(x,y,w,h,r) {
 
 resize();
 
-
 function exitGame() {
   gameRunning = false;
   document.getElementById('inGameExitBtn').style.display='none';
@@ -1756,10 +1569,8 @@ function exitGame() {
   overlay.classList.remove('hidden');
 
   document.getElementById('overlayTitle').innerHTML = 'MAAT ASTRONAUTA';
-
   document.getElementById('overlaySub').innerHTML =
     '☆ Gata espacial en busca de ovillos ☆<br><br><span style="color:rgba(34,211,238,0.7)">← → mover · ↑ / espacio saltar</span>';
-
   document.getElementById('overlayScore').style.display = 'none';
   document.getElementById('playBtn').innerHTML = '🚀 LANZAR MISIÓN';
 
@@ -1767,8 +1578,6 @@ function exitGame() {
   musicOn = false;
   document.getElementById('musicBtn').textContent = '🔇';
 }
-
-
 
 function toggleMusic(){
   initAudio();
@@ -1789,8 +1598,6 @@ function _doToggleMusic(){
   const floatBtn = document.querySelector('.music-floating');
   if (floatBtn) floatBtn.textContent = musicOn ? '♫' : '♪';
 }
-
-
 </script>
 </body>
 </html>
