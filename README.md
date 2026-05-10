@@ -1,9 +1,8 @@
-# <img width="1254" height="1254" alt="file_0000000033d071fb83fe2cc3f968fecc" src="https://github.com/user-attachments/assets/5d88247e-0205-4ac1-a31e-41320c9be34c" />
+# <img width="1086" height="1448" alt="Banner" src="https://github.com/user-attachments/assets/0ee728e4-3768-45eb-abc1-c67fc799df7a" />
 🚀 Maat Astronauta
 
 <div align="center">
 
-<img width="1086" height="1448" alt="Banner" src="https://github.com/user-attachments/assets/0ee728e4-3768-45eb-abc1-c67fc799df7a" />
 
 **Un juego de plataformas espacial protagonizado por Maat, la intrépida gata astronauta.**
 
