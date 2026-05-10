@@ -1623,18 +1623,41 @@ function drawSpaceship() {
     ctx.restore();
   }
 
-  // Mensaje de victoria
+  // Mensaje de victoria — estilo arcade
   if (winTimer > 120) {
     const alpha = Math.min((winTimer-120)/30, 1);
+    const pulse = 0.7 + 0.3 * Math.sin(winTimer * 0.18);
+    const fontSize = Math.min(24*S, 48);
+    ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = '#fff';
-    ctx.font = `bold ${Math.min(22*S,46)}px 'Orbitron', monospace`;
     ctx.textAlign = 'center';
-    ctx.shadowBlur = 22*S; ctx.shadowColor = 'rgba(255,215,0,0.9)';
+    ctx.font = `900 ${fontSize}px 'Orbitron', monospace`;
+
+    // capa glow exterior dorada
+    ctx.shadowBlur = 40*S * pulse; ctx.shadowColor = 'rgba(255,200,0,0.9)';
+    ctx.fillStyle = 'rgba(255,215,0,0.25)';
     ctx.fillText('MICHI MISIÓN CUMPLIDA', W/2, H/2 - 50*S);
+
+    // capa glow interior blanca
+    ctx.shadowBlur = 14*S; ctx.shadowColor = '#fff';
+    ctx.fillStyle = '#ffe97a';
+    ctx.fillText('MICHI MISIÓN CUMPLIDA', W/2, H/2 - 50*S);
+
+    // texto principal blanco nítido
     ctx.shadowBlur = 0;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText('MICHI MISIÓN CUMPLIDA', W/2, H/2 - 50*S);
+
+    // subtítulo estilo arcade score
+    const subSize = Math.min(11*S, 18);
+    ctx.font = `700 ${subSize}px 'Orbitron', monospace`;
+    ctx.fillStyle = 'rgba(34,211,238,0.9)';
+    ctx.shadowBlur = 8*S; ctx.shadowColor = '#22d3ee';
+    ctx.fillText('— MISIÓN COMPLETA —', W/2, H/2 - 24*S);
+    ctx.shadowBlur = 0;
+
     ctx.textAlign = 'left';
-    ctx.globalAlpha = 1;
+    ctx.restore();
   }
 
   ctx.restore();
