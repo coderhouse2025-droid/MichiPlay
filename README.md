@@ -3,11 +3,7 @@
 
 <div align="center">
 
-![Maat Astronauta Banner](https://img.shields.io/badge/Maat-Astronauta-7c3aed?style=for-the-badge&logo=rocket&logoColor=white)
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![No Dependencies](https://img.shields.io/badge/dependencias-ninguna-22d3ee?style=for-the-badge)
+<img width="1086" height="1448" alt="Banner" src="https://github.com/user-attachments/assets/0ee728e4-3768-45eb-abc1-c67fc799df7a" />
 
 **Un juego de plataformas espacial protagonizado por Maat, la intrépida gata astronauta.**
 
