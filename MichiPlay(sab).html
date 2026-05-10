@@ -1367,8 +1367,16 @@ function drawMaat() {
   ctx.fillRect(x+6*s, y+maat.h*0.45, maat.w-12*s, 4*s);
   ctx.fillStyle = '#1d4ed8';
   ctx.beginPath(); ctx.arc(x+maat.w*0.5, y+maat.h*0.6, 4*s, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle='#ffe97a'; ctx.font=`bold ${5*s}px Orbitron`;
-  ctx.textAlign='center'; ctx.fillText('M',x+maat.w/2,y+maat.h*0.62+1.5*s); ctx.textAlign='left';
+  // Huella de gato en el pecho (reemplaza la "M")
+  const px = x + maat.w/2, py = y + maat.h * 0.6;
+  ctx.fillStyle = '#ffe97a';
+  // Almohadilla central (grande)
+  ctx.beginPath(); ctx.ellipse(px, py + 1.2*s, 2.8*s, 2.2*s, 0, 0, Math.PI*2); ctx.fill();
+  // 4 almohadillas pequeñas superiores
+  ctx.beginPath(); ctx.ellipse(px - 2.6*s, py - 1.4*s, 1.1*s, 0.85*s, -0.4, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(px - 0.8*s, py - 2.4*s, 1.0*s, 0.8*s,  -0.1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(px + 1.0*s, py - 2.4*s, 1.0*s, 0.8*s,   0.1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(px + 2.6*s, py - 1.4*s, 1.1*s, 0.85*s,  0.4, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle=suitDark;
   ctx.fillRect(x-3*s, y+maat.h*0.4, 5*s, maat.h*0.3);
   ctx.fillRect(x+maat.w-2*s, y+maat.h*0.4, 5*s, maat.h*0.3);
