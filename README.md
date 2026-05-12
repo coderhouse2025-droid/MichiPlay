@@ -17,7 +17,7 @@
 
 ## 🌌 Sobre el juego
 
-**Maat** es una gata astronauta perdida en el cosmos. Ayudala a recolectar **12 ovillos de lana** dispersos en plataformas espaciales, esquivando a los bichos alienígenas que patrullan cada órbita. Cuando complete su misión, una nave espacial aterrizará para llevarla de regreso a las estrellas.
+**Maat** es una gata astronauta perdida en el cosmos. Ayudala a recolectar **ovillos de lana** dispersos en plataformas espaciales, esquivando a los bichos alienígenas que patrullan cada órbita. Cuando complete su misión, una nave espacial aterrizará para llevarla de regreso a las estrellas.
 
 > *Una aventura de plataformas arcade en un único archivo HTML, sin frameworks, sin instalación, jugable desde cualquier dispositivo.*
 
