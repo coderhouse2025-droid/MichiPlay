@@ -118,12 +118,13 @@ MichiPlay/
 **Opción 1 — Directamente en el navegador:**
 ```
 https://coderhouse2025-droid.github.io/MichiPlay/
+
 ```
 👤 Autor
 Juan Manuel Orellana
 ---
 
 
-*"Una michi aventura espacial hecha con amor 🐾✨"*
+                                                         *"Una michi aventura espacial hecha con amor 🐾✨"*
 
 </div>
