@@ -117,7 +117,7 @@ MichiPlay/
 
 **Opción 1 — Directamente en el navegador:**
 ```
-Descargar MichiPlay_fixed.html → doble click → listo
+Descargar: [MichiPlay_fixed.html → doble click](https://coderhouse2025-droid.github.io/MichiPlay/) → listo
 ```
 
 **Opción 2 — GitHub Pages:**
