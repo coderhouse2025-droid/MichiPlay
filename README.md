@@ -1,3 +1,6 @@
+<img width="1086" height="1448" alt="Banner Final" src="https://github.com/user-attachments/assets/f98cef5f-8a64-4241-9d35-5d63f5a26e0b" />
+
+
 <div align="center">
 
 <img src="https://raw.githubusercontent.com/coderhouse2025-droid/MichiPlay/main/Maat_Astronauta.png" width="160" alt="Maat Astronauta">
