@@ -1,106 +1,140 @@
-# <img width="1086" height="1448" alt="Banner" src="https://github.com/user-attachments/assets/0ee728e4-3768-45eb-abc1-c67fc799df7a" />
-🚀 Maat Astronauta
-
 <div align="center">
 
+<img src="https://raw.githubusercontent.com/coderhouse2025-droid/MichiPlay/main/Maat_Astronauta.png" width="160" alt="Maat Astronauta">
 
-**Un juego de plataformas espacial protagonizado por Maat, la intrépida gata astronauta.**
+# 🐱🚀 Maat Astronauta
 
-[▶ Jugar ahora](#demo) · [Reportar un bug](../../issues) · [Sugerir una mejora](../../issues)
+**Videojuego arcade espacial · HTML5 · Un solo archivo · Sin instalación**
+
+[![Jugar ahora](https://img.shields.io/badge/🎮_JUGAR_AHORA-020818?style=for-the-badge&logo=rocket&logoColor=22d3ee)](https://coderhouse2025-droid.github.io/MichiPlay/)
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/es/docs/Web/JavaScript)
+[![Canvas API](https://img.shields.io/badge/Canvas_API-22d3ee?style=for-the-badge)](https://developer.mozilla.org/es/docs/Web/API/Canvas_API)
 
 </div>
 
 ---
 
-## 🌕 Sobre el juego
+## 🌌 Sobre el juego
 
-**Maat Astronauta** es un juego de plataformas 2D completamente desarrollado en HTML5 puro, sin frameworks ni dependencias externas. La protagonista es **Maat**, una gata atigrada que surca el espacio exterior con su traje de astronauta, recolectando ovillos cósmicos a través de distintas órbitas.
+**Maat** es una gata astronauta perdida en el cosmos. Ayudala a recolectar **12 ovillos de lana** dispersos en plataformas espaciales, esquivando a los bichos alienígenas que patrullan cada órbita. Cuando complete su misión, una nave espacial aterrizará para llevarla de regreso a las estrellas.
 
-El juego nació como un proyecto personal de creatividad y fue evolucionando hasta convertirse en una experiencia visual y sonora completa, todo en un único archivo `.html`.
-
----
-
-## ✨ Características
-
-- 🎮 **Plataformas 2D con físicas fluidas** — aceleración, fricción, salto y colisiones precisas
-- 🌌 **Fondo espacial dinámico** — nebulosas, campo de estrellas titilantes y estrellas fugaces
-- 🐱 **Maat dibujada con Canvas API** — traje espacial, casco con visor, cara atigrada y cola
-- 👾 **3 tipos de enemigos** — asteroides rotativos, robots espaciales y minas con púas
-- 🎵 **Música ambiental generada en tiempo real** con Web Audio API (sin archivos externos)
-- 🔊 **Efectos de sonido** para salto, recolección, daño y subida de nivel
-- 📈 **Sistema de niveles progresivo** — 5 órbitas con dificultad creciente
-- 💥 **Sistema de partículas** — explosiones de confeti, polvo de salto y destellos
-- 📱 **Compatible con móviles** — controles táctiles que aparecen automáticamente
-- 🖥️ **Pantalla completa adaptable** — se escala a cualquier resolución
-- ⚡ **Sin dependencias** — un solo archivo `.html`, listo para abrir en el navegador
+> *Una aventura de plataformas arcade en un único archivo HTML, sin frameworks, sin instalación, jugable desde cualquier dispositivo.*
 
 ---
 
-## 🎮 Controles
+## 🎮 Cómo jugar
 
-| Acción | Teclado | Móvil |
-|--------|---------|-------|
-| Mover izquierda | `←` / `A` | Botón ◀ |
-| Mover derecha | `→` / `D` | Botón ▶ |
-| Saltar | `↑` / `W` / `Espacio` | Botón ↑ |
-| Reiniciar | `R` | Botón "Nueva Misión" |
-| Música | Botón 🔊 en pantalla | Botón 🔊 en pantalla |
+| Acción | Teclado | Celular |
+|--------|---------|---------|
+| Moverse | `←` `→` | Botones ◀ ▶ |
+| Saltar | `↑` o `Espacio` | Botón ↑ |
+| Música | Botón 🔊 | Botón 🔊 |
+| Salir | Botón Exit | Botón Exit |
 
----
-
-## 🌌 Niveles
-
-| # | Nombre | Ovillos | Velocidad enemigos | Ambiente |
-|---|--------|---------|-------------------|----------|
-| 1 | ÓRBITA 1 | 4 | Lenta | Espacio cercano 🌕 |
-| 2 | LUNA | 6 | Media | Superficie lunar 🌖 |
-| 3 | ASTEROIDE | 8 | Rápida | Cinturón de asteroides 🌗 |
-| 4 | NEBULOSA | 10 | Muy rápida | Nebulosa profunda 🌘 |
-| 5 | ABISMO | 12 | Extrema | Espacio profundo 🌑 |
+**Objetivo:** recolectar **12 🧶 ovillos** antes de que los bichos te atrapen. Tenés **3 vidas** 🐾.
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## 🌠 Niveles
 
-- **HTML5 Canvas API** — motor de renderizado 2D completo
-- **Web Audio API** — síntesis de música y efectos en tiempo real
-- **CSS3** — animaciones, efectos de blur, glassmorphism y tipografía
-- **JavaScript vanilla (ES6+)** — lógica del juego, físicas y gestión de estado
-- **Google Fonts** — tipografías Orbitron y Exo 2
+Cada nivel tiene una paleta de color y dificultad creciente:
+
+| # | Nombre | Color | Enemigos |
+|---|--------|-------|----------|
+| 1 | Órbita 1 | 🩵 Cian | 2 |
+| 2 | Luna | 💜 Morado | 3 |
+| 3 | Asteroide | 🧡 Naranja | 4 |
+| 4 | Nebulosa | 💚 Verde | 5 |
+| 5 | Abismo | 💛 Dorado | 6 |
 
 ---
 
-## 📁 Estructura del proyecto
+## 🏁 Secuencia final
+
+Al completar los 12 ovillos se activa la cinemática de victoria:
 
 ```
-maat-astronauta/
-│
-├── Maat_Astronauta.html    # Juego completo (único archivo)
-├── Maat_Astronauta.png     # Imagen de referencia del personaje
-└── README.md               # Este archivo
+🚀 La nave desciende hasta el suelo
+🐱 Maat camina y sube a bordo
+🔥 Ignición — los motores se encienden
+⬆️  Despegue acelerado hacia las estrellas
+✨ Aparece: MICHI MISIÓN CUMPLIDA
 ```
 
 ---
 
-## 🎨 Créditos y contexto
+## 🛠️ Tecnologías
 
-Este juego fue creado con cariño como homenaje a **Maat**, una gata atigrada real. La imagen de referencia del personaje (`Maat_Astronauta.png`) inspiró el diseño visual del sprite: pelaje atigrado gris/marrón, ojos amarillo-verdes característicos y actitud exploradora.
-
-El proyecto evolucionó desde una versión original más simple hasta esta versión con temática espacial completa.
-
----
-👤 Autor
-
-Juan Manuel Orellana
-
----
-
-## 📜 Licencia
-
-Este proyecto es de uso libre para fines personales y educativos.
+```
+HTML5 Canvas API    →  renderizado completo del juego (sin imágenes para sprites)
+Web Audio API       →  efectos de sonido sintetizados en tiempo real
+Screen Orientation  →  bloqueo automático a horizontal en mobile
+CSS Custom Props    →  sistema de temas por nivel (5 paletas)
+Open Graph / OG     →  preview atractivo al compartir el link
+Google Fonts        →  Orbitron (arcade) + Exo 2 (UI)
+```
 
 ---
+
+## 📁 Estructura del repositorio
+
+```
+MichiPlay/
+├── MichiPlay_fixed.html     ← el juego completo (un solo archivo)
+├── Maat_Astronauta.png      ← imagen hero (portada y Open Graph)
+├── README.md                ← este archivo
+└── Sonidos/
+    ├── Musica-espacial.mp3
+    ├── MIAU.mp3
+    └── rocket_launch.mp3
+```
+
+---
+
+## 📱 Mobile
+
+- ✅ Controles táctiles minimalistas (no tapan la pantalla)
+- ✅ Gira automáticamente a modo horizontal al iniciar
+- ✅ Aviso visual si el teléfono está en vertical
+- ✅ Escala proporcional a cualquier tamaño de pantalla
+- ✅ Preview del link en WhatsApp, Twitter, Discord, Telegram
+
+---
+
+## 🎨 Características técnicas destacadas
+
+- **Sin dependencias** — cero npm, cero frameworks, cero instalación
+- **Sprite procedural** — Maat dibujada 100% con Canvas (elipses, arcos, bézier)
+- **Audio procedural** — sonidos de salto, daño y colección sintetizados con osciladores
+- **Física propia** — gravedad, aceleración, fricción y colisiones AABB implementadas desde cero
+- **Sistema de partículas** — estrellas fugaces, partículas de colisión, humo del cohete
+- **Efecto scanline CSS** — estética CRT retro sobre toda la pantalla
+
+---
+
+## 🚀 Cómo ejecutar
+
+**Opción 1 — Directamente en el navegador:**
+```
+Descargar MichiPlay_fixed.html → doble click → listo
+```
+
+**Opción 2 — GitHub Pages:**
+```
+Settings → Pages → Source: main branch → / (root)
+El juego queda en: https://[usuario].github.io/MichiPlay/
+```
+
+---
+
+## 👩‍💻 Desarrollado con
 
 <div align="center">
-  Hecho con 💜 y muchos maulidos cósmicos · <em>Un día, una michi.</em> 🐾
+
+Diseño, programación y assets · **2025–2026**  
+Asistencia técnica y code review · [Claude (Anthropic)](https://claude.ai)
+
+*"Una michi aventura espacial hecha con amor 🐾✨"*
+
 </div>
