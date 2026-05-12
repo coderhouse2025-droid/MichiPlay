@@ -125,7 +125,8 @@ https://coderhouse2025-droid.github.io/MichiPlay/
 Settings → Pages → Source: main branch → / (root)
 El juego queda en: https://[usuario].github.io/MichiPlay/
 ```
-
+👤 Autor
+Juan Manuel Orellana
 ---
 
 ## 👩‍💻 Desarrollado con
