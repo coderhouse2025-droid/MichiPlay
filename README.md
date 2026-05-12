@@ -132,8 +132,6 @@ El juego queda en: https://[usuario].github.io/MichiPlay/
 
 <div align="center">
 
-Diseño, programación y assets · **2025–2026**  
-Asistencia técnica y code review · [Claude (Anthropic)](https://claude.ai)
 
 *"Una michi aventura espacial hecha con amor 🐾✨"*
 
