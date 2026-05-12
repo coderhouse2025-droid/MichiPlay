@@ -120,7 +120,8 @@ MichiPlay/
 https://coderhouse2025-droid.github.io/MichiPlay/
 
 ```
-👤 Autor
+# 👤 Autor
+
 Juan Manuel Orellana
 ---
 
