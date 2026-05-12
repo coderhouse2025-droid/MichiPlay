@@ -117,7 +117,7 @@ MichiPlay/
 
 **Opción 1 — Directamente en el navegador:**
 ```
-Descargar: https://coderhouse2025-droid.github.io/MichiPlay/ → listo
+https://coderhouse2025-droid.github.io/MichiPlay/ 
 ```
 
 **Opción 2 — GitHub Pages:**
