@@ -117,21 +117,11 @@ MichiPlay/
 
 **Opción 1 — Directamente en el navegador:**
 ```
-https://coderhouse2025-droid.github.io/MichiPlay/ 
-```
-
-**Opción 2 — GitHub Pages:**
-```
-Settings → Pages → Source: main branch → / (root)
-El juego queda en: https://[usuario].github.io/MichiPlay/
+https://coderhouse2025-droid.github.io/MichiPlay/
 ```
 👤 Autor
 Juan Manuel Orellana
 ---
-
-## 👩‍💻 Desarrollado con
-
-<div align="center">
 
 
 *"Una michi aventura espacial hecha con amor 🐾✨"*
