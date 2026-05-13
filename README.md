@@ -8,6 +8,8 @@
 # 🐱🚀 Maat Astronauta
 
 **Videojuego arcade espacial · HTML5 · Un solo archivo · Sin instalación**
+<img width="1536" height="1024" alt="file_00000000a98471f5b7c6cb9473ef3ad1" src="https://github.com/user-attachments/assets/b6311cfc-dba1-4cf5-9478-2d11397b028d" />
+
 
 [![Jugar ahora](https://img.shields.io/badge/🎮_JUGAR_AHORA-020818?style=for-the-badge&logo=rocket&logoColor=22d3ee)](https://coderhouse2025-droid.github.io/MichiPlay/)
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
