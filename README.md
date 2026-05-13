@@ -1,4 +1,5 @@
-<img width="1086" height="1448" alt="Banner Final" src="https://github.com/user-attachments/assets/f98cef5f-8a64-4241-9d35-5d63f5a26e0b" />
+<img width="1086" height="1448" alt="Banner QR" src="https://github.com/user-attachments/assets/de2f58c1-de7d-47a0-a94e-aab9419c271a" />
+
 
 
 <div align="center">
