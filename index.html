@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Maat Astronauta 🚀🐱</title>
+
+<!-- Open Graph: preview atractivo al compartir el link -->
+<meta property="og:title" content="🐱🚀 Maat Astronauta — La Gata Espacial">
+<meta property="og:description" content="¡Ayudá a Maat a recolectar ovillos por el cosmos y despegar en su cohete! Juego arcade 100% gratuito, jugá desde el celular 🧶✨">
+<meta property="og:image" content="https://raw.githubusercontent.com/coderhouse2025-droid/MichiPlay/main/Maat_Astronauta.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="🐱🚀 Maat Astronauta — La Gata Espacial">
+<meta name="twitter:description" content="¡Ayudá a Maat a recolectar ovillos por el cosmos! Arcade espacial gratis 🧶✨">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/coderhouse2025-droid/MichiPlay/main/Maat_Astronauta.png">
+<meta name="description" content="Maat Astronauta: la gata espacial que recolecta ovillos por el cosmos. Juego arcade gratis para celular y PC.">
+<meta name="theme-color" content="#020818">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;700&display=swap');
+
+  :root {
+    --space-deep: #020818;
+    --space-mid: #0a1628;
+    --moon-silver: #c8d8f0;
+    --star-gold: #ffe97a;
+    --nebula-purple: #7c3aed;
+    --nebula-pink: #db2777;
+    --suit-white: #dde8f5;
+    --suit-grey: #8fa8c8;
+    --visor-blue: #3b82f6;
+    --accent-cyan: #22d3ee;
+    --accent-purple: #7c3aed;
+    --accent-pink: #db2777;
+    --accent-orange: #f97316;
+    --accent-green: #10b981;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    background: var(--space-deep);
+    overflow: hidden;
+    font-family: 'Exo 2', sans-serif;
+    width: 100vw; height: 100vh;
+    cursor: crosshair;
+  }
+
+  #gameCanvas {
+    display: block;
+    position: absolute;
+    top: 0; left: 0;
+    touch-action: none;
+  }
+
+  /* ── HUD ── */
+  #hud {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 14px 18px;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    pointer-events: none; z-index: 10;
+  }
+  .hud-pill {
+    background: rgba(2,8,24,0.7);
+    border: 1px solid rgba(34,211,238,0.3);
+    border-radius: 50px;
+    padding: 7px 18px;
+    display: flex; align-items: center; gap: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(34,211,238,0.1), inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: border-color 0.5s, box-shadow 0.5s;
+  }
+  .hud-score {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(14px, 2.5vw, 20px);
+    color: var(--star-gold);
+    letter-spacing: 2px;
+    text-shadow: 0 0 12px rgba(255,233,122,0.6);
+  }
+  .hud-level {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(11px, 1.8vw, 15px);
+    color: var(--accent-cyan);
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(34,211,238,0.5);
+    transition: color 0.5s, text-shadow 0.5s;
+  }
+  .hud-lives {
+    font-size: clamp(14px, 2.5vw, 20px);
+    letter-spacing: 3px;
+  }
+  .hud-left-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* ── OVERLAY ── */
+  #overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 20;
+    background: rgba(2,8,24,0.88);
+    backdrop-filter: blur(8px);
+    transition: opacity 0.5s;
+  }
+  #overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .overlay-card {
+    background: linear-gradient(160deg, rgba(10,22,40,0.97) 0%, rgba(20,10,50,0.97) 100%);
+    border: 1px solid rgba(34,211,238,0.25);
+    border-radius: 28px;
+    padding: clamp(28px,5vw,52px) clamp(32px,6vw,64px);
+    text-align: center;
+    box-shadow: 0 0 80px rgba(34,211,238,0.08), 0 40px 80px rgba(0,0,0,0.7);
+    max-width: min(520px, 92vw);
+    position: relative;
+    overflow: hidden;
+  }
+  .overlay-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .overlay-exit-label {
+    position: absolute;
+    top: 12px; right: 18px;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: rgba(200,216,240,0.45);
+    text-shadow: 0 0 8px rgba(255,255,255,0.1);
+    pointer-events: none;
+  }
+
+  .overlay-icon { font-size: clamp(52px,10vw,80px); margin-bottom: 8px; animation: floatIcon 3s ease-in-out infinite; }
+  @keyframes floatIcon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  .overlay-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(22px,5vw,42px);
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 3px;
+    text-shadow: 0 0 30px rgba(34,211,238,0.5), 0 0 60px rgba(124,58,237,0.3);
+    margin-bottom: 6px;
+  }
+  .overlay-sub {
+    font-size: clamp(12px,2vw,15px);
+    color: rgba(200,216,240,0.65);
+    margin-bottom: 28px;
+    line-height: 1.7;
+    letter-spacing: 0.5px;
+  }
+  .overlay-score-big {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(16px,3vw,24px);
+    color: var(--accent-cyan);
+    margin-bottom: 24px;
+    text-shadow: 0 0 15px rgba(34,211,238,0.5);
+  }
+
+  .btn-launch {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(14px,2.5vw,18px);
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 14px 44px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #22d3ee, #7c3aed);
+    color: #fff;
+    box-shadow: 0 8px 30px rgba(34,211,238,0.35), 0 0 0 1px rgba(255,255,255,0.1);
+    transition: transform 0.15s, box-shadow 0.15s;
+    pointer-events: all;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-launch::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  }
+  .btn-launch:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 14px 40px rgba(34,211,238,0.5); }
+  .btn-launch:active { transform: scale(0.96); }
+
+  /* ── DOCK LUNAR — es el suelo del juego ── */
+  #touchControls {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 90px;
+    z-index: 10;
+    pointer-events: none;
+    display: none;
+    touch-action: none;
+
+    /* Suelo lunar con textura y cráteres decorativos */
+    background:
+      /* cráteres */
+      radial-gradient(ellipse 70px 10px at  9% 30%, rgba(30,40,55,0.7) 0%, rgba(30,40,55,0) 70%),
+      radial-gradient(ellipse 45px  7px at 28% 55%, rgba(25,35,50,0.5) 0%, rgba(25,35,50,0) 70%),
+      radial-gradient(ellipse 55px  8px at 52% 35%, rgba(30,40,55,0.6) 0%, rgba(30,40,55,0) 70%),
+      radial-gradient(ellipse 40px  6px at 72% 50%, rgba(25,35,50,0.5) 0%, rgba(25,35,50,0) 70%),
+      radial-gradient(ellipse 60px  9px at 91% 30%, rgba(30,40,55,0.6) 0%, rgba(30,40,55,0) 70%),
+      /* gradiente base del suelo */
+      linear-gradient(180deg,
+        #5a6a80 0%,
+        #4a5a70 18%,
+        #3a4a5e 45%,
+        #1e2a3a 100%
+      );
+
+    /* Borde superior: línea de luz que simula el horizonte lunar */
+    border-top: 2px solid rgba(140,170,210,0.35);
+    box-shadow:
+      inset 0 3px 12px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(180,210,240,0.12);
+
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    gap: 0;
+  }
+
+  #touchControls.active { display: flex; pointer-events: all; }
+
+  @media (pointer: fine) {
+    #touchControls, #touchControls.active {
+      display: none !important; pointer-events: none !important;
+    }
+  }
+
+  /* Grupo izquierdo (D-pad) */
+  .t-dpad { display: flex; gap: 10px; align-items: center; }
+
+  /* Botón base */
+  .t-btn {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    cursor: pointer; pointer-events: all;
+    transition: transform 0.07s, box-shadow 0.07s, background 0.07s;
+
+    /* Aspecto de roca lunar / panel metálico */
+    background: radial-gradient(ellipse at 38% 32%,
+      rgba(110,130,160,0.55) 0%,
+      rgba(40,55,75,0.9) 60%,
+      rgba(20,30,45,0.95) 100%
+    );
+    border: 1.5px solid rgba(120,150,190,0.3);
+    color: rgba(160,200,240,0.75);
+    box-shadow:
+      0 4px 12px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(200,220,255,0.1),
+      inset 0 -1px 0 rgba(0,0,0,0.3);
+  }
+  .t-btn.pressed, .t-btn:active {
+    background: radial-gradient(ellipse at 38% 32%,
+      rgba(34,211,238,0.3) 0%,
+      rgba(10,40,70,0.95) 60%,
+      rgba(5,20,40,1) 100%
+    );
+    border-color: rgba(34,211,238,0.7);
+    color: #22d3ee;
+    transform: scale(0.88) translateY(2px);
+    box-shadow:
+      0 1px 4px rgba(0,0,0,0.8),
+      0 0 16px rgba(34,211,238,0.4),
+      inset 0 1px 0 rgba(34,211,238,0.15);
+  }
+
+  /* Botón salto (circular, destaca más) */
+  .t-jump {
+    width: 62px; height: 62px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    cursor: pointer; pointer-events: all;
+    transition: transform 0.07s, box-shadow 0.07s, background 0.07s;
+
+    background: radial-gradient(ellipse at 38% 32%,
+      rgba(130,100,200,0.5) 0%,
+      rgba(50,25,90,0.9) 60%,
+      rgba(20,10,40,0.95) 100%
+    );
+    border: 1.5px solid rgba(160,130,220,0.35);
+    color: rgba(200,170,255,0.8);
+    box-shadow:
+      0 4px 12px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(200,180,255,0.1),
+      inset 0 -1px 0 rgba(0,0,0,0.3);
+  }
+  .t-jump.pressed, .t-jump:active {
+    background: radial-gradient(ellipse at 38% 32%,
+      rgba(124,58,237,0.45) 0%,
+      rgba(30,10,60,0.95) 60%,
+      rgba(10,5,25,1) 100%
+    );
+    border-color: rgba(167,139,250,0.85);
+    color: #a78bfa;
+    transform: scale(0.88) translateY(2px);
+    box-shadow:
+      0 1px 4px rgba(0,0,0,0.8),
+      0 0 18px rgba(124,58,237,0.55),
+      inset 0 1px 0 rgba(167,139,250,0.2);
+  }
+
+  /* ── FLOAT TEXT ── */
+  .float-text {
+    position: absolute;
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(14px,2.5vw,20px);
+    color: var(--star-gold);
+    text-shadow: 0 0 10px rgba(255,233,122,0.8);
+    pointer-events: none; z-index: 30;
+    animation: floatUp 1s ease-out forwards;
+    white-space: nowrap;
+  }
+  @keyframes floatUp {
+    0%{opacity:1;transform:translateY(0) scale(1)}
+    100%{opacity:0;transform:translateY(-70px) scale(1.25)}
+  }
+
+  /* ── SHAKE ── */
+  @keyframes hudShake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-7px)}
+    40%{transform:translateX(7px)}
+    60%{transform:translateX(-4px)}
+    80%{transform:translateX(4px)}
+  }
+  .hud-shake { animation: hudShake 0.38s ease; }
+
+  /* ── MUSIC TOGGLE ── */
+  #musicBtn {
+    position: absolute; top: 14px; right: 18px;
+    z-index: 25; pointer-events: all;
+    background: rgba(2,8,24,0.7);
+    border: 1px solid rgba(34,211,238,0.3);
+    border-radius: 50%;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s, background 0.2s;
+  }
+  #musicBtn:hover { transform: scale(1.15); background: rgba(34,211,238,0.15); }
+
+  /* EXIT button below music */
+  #inGameExitBtn {
+    position: absolute; top: 64px; right: 18px;
+    z-index: 25; pointer-events: all;
+    background: rgba(255,59,48,0.85);
+    border: 1px solid rgba(255,100,90,0.5);
+    border-radius: 50px;
+    color: white;
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 0 14px rgba(255,59,48,.4);
+    backdrop-filter: blur(8px);
+    padding: 6px 18px;
+    display: none;
+  }
+
+  /* scanline effect */
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:99;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  }
+
+/* ─────────────────────────────────────────
+   PANTALLA PRINCIPAL PRO
+───────────────────────────────────────── */
+
+.cover-title {
+  position: absolute;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Orbitron';
+  font-size: clamp(18px, 2vw, 28px);
+  color: white;
+  opacity: 0.9;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(255,255,255,0.2);
+}
+
+.hero-img {
+  width: 180px;
+  border-radius: 24px;
+  margin-bottom: 18px;
+  margin-top: 30px;
+  filter: drop-shadow(0 0 30px rgba(34,211,238,0.45));
+  animation: heroFloat 4s ease-in-out infinite;
+  background: transparent;
+}
+
+@keyframes heroFloat {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.overlay-card {
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(34,211,238,0.25);
+  animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.btn-launch {
+  animation: glowPulse 2s infinite;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 10px rgba(34,211,238,0.4); }
+  50% { box-shadow: 0 0 35px rgba(124,58,237,0.8); }
+  100% { box-shadow: 0 0 10px rgba(34,211,238,0.4); }
+}
+
+.btn-launch:hover {
+  transform: translateY(-4px) scale(1.04);
+}
+
+body {
+  animation: bgMove 10s ease-in-out infinite alternate;
+}
+
+@keyframes bgMove {
+  from { background-position: 0 0; }
+  to { background-position: 0 30px; }
+}
+
+
+.music-floating{
+  position:absolute;
+  top:24px;
+  right:24px;
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,0.15);
+  background:rgba(0,0,0,0.25);
+  color:white;
+  font-size:28px;
+  cursor:pointer;
+  z-index:5;
+  backdrop-filter: blur(8px);
+}
+
+.overlay-exit{
+  position:absolute;
+  top:24px;
+  right:110px;
+  width:78px;
+  height:78px;
+  border:none;
+  border-radius:50%;
+  background:#ff3b30;
+  color:white;
+  font-family:'Orbitron';
+  font-size:20px;
+  cursor:pointer;
+  box-shadow:0 0 25px rgba(255,59,48,.65);
+  z-index:100;
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay-card{
+  background:rgba(9,11,35,0.55)!important;
+  border-radius:34px!important;
+  padding-top:clamp(60px,8vw,90px)!important;
+  padding-bottom:clamp(24px,4vw,40px)!important;
+  width:min(88vw,540px)!important;
+  max-height:95vh;
+  overflow-y:auto;
+}
+
+.overlay-title{
+  font-size: clamp(26px, 5vw, 54px)!important;
+  text-shadow: 0 0 25px rgba(34,211,238,0.75);
+}
+
+.overlay-sub{
+  font-size: clamp(13px,2vw,18px)!important;
+  opacity:0.9;
+}
+
+.hero-img{
+  width:clamp(120px,30vw,220px)!important;
+}
+
+.btn-launch{
+  border-radius:999px!important;
+  font-size:clamp(15px,2vw,22px)!important;
+  padding:16px 24px!important;
+}
+
+#overlayExitBtn {
+  background: linear-gradient(135deg, #ff3b30, #7c1a14) !important;
+  box-shadow: 0 8px 30px rgba(255,59,48,0.35), 0 0 0 1px rgba(255,255,255,0.1) !important;
+}
+
+.btn-launch {
+  width: 100% !important;
+}
+
+
+  /* ── RESPONSIVE MOBILE ── */
+  @media (max-width: 600px) {
+    #hud { padding: 8px 10px; }
+    .hud-pill { padding: 5px 10px; gap: 6px; }
+    #musicBtn { width: 36px; height: 36px; font-size: 16px; top: 10px; right: 10px; }
+    #inGameExitBtn { font-size: 12px; padding: 4px 12px; top: 54px; right: 10px; }
+    .music-floating { width: 48px; height: 48px; font-size: 20px; top: 14px; right: 14px; }
+  }
+  @media (max-height: 500px) {
+    .hero-img { width: 80px!important; margin-bottom: 6px; }
+    .overlay-title { font-size: clamp(18px,4vw,28px)!important; }
+    .overlay-card { padding-top: 40px!important; }
+    #touchControls { height: 70px; }
+    .t-btn { width: 48px; height: 48px; font-size: 18px; }
+    .t-jump { width: 54px; height: 54px; font-size: 22px; }
+  }
+
+  /* ── AVISO ORIENTACIÓN: pide landscape, aparece solo en PORTRAIT en mobile ── */
+  #orientationWarning {
+    display: none;
+    position: fixed; inset: 0; z-index: 9999;
+    background: #050714;
+    flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 18px; text-align: center; padding: 24px;
+  }
+  #orientationWarning .orient-icon {
+    font-size: 64px;
+    animation: rotateHint 1.8s ease-in-out infinite;
+  }
+  #orientationWarning p {
+    color: #c8d8f0;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 18px; line-height: 1.5; max-width: 280px;
+  }
+  @keyframes rotateHint {
+    0%   { transform: rotate(0deg); }
+    40%  { transform: rotate(-90deg); }
+    60%  { transform: rotate(-90deg); }
+    100% { transform: rotate(0deg); }
+  }
+  /* Aviso de orientación: solo en mobile EN portrait Y solo durante el juego activo */
+  @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+    body.playing #orientationWarning { display: flex; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<!-- Aviso de orientación: solo visible en mobile portrait -->
+<div id="orientationWarning">
+  <div class="orient-icon">📱</div>
+  <p>Para jugar mejor,<br>girá el teléfono en <strong style="color:#22d3ee">horizontal</strong> 🚀</p>
+</div>
+
+<div id="hud">
+  <div class="hud-left-col">
+    <div class="hud-pill" id="hudScorePill">
+      <span style="font-size:18px">🧶</span>
+      <span class="hud-score" id="scoreDisplay">000</span>
+    </div>
+    <div class="hud-pill" id="hudLivesPill">
+      <span class="hud-lives" id="livesDisplay">🐾🐾🐾</span>
+    </div>
+  </div>
+  <div class="hud-pill hud-level" id="levelDisplay" style="position:absolute;top:14px;left:50%;transform:translateX(-50%);pointer-events:none;">ÓRBITA</div>
+</div>
+
+<!-- In-game EXIT button moved next to music -->
+<button id="inGameExitBtn" onclick="exitGame()">Exit</button>
+
+<button id="musicBtn" title="Música" onclick="toggleMusic()">🎵</button>
+
+<!-- Audio de fondo (archivo externo) -->
+<audio id="musicaFondo" src="https://raw.githubusercontent.com/coderhouse2025-droid/MichiPlay/main/Sonidos/Musica-espacial.mp3" loop></audio>
+<audio id="miauSound" src="https://raw.githubusercontent.com/coderhouse2025-droid/MichiPlay/main/Sonidos/MIAU.mp3" preload="auto"></audio>
+<audio id="rocketSound" src="https://raw.githubusercontent.com/coderhouse2025-droid/MichiPlay/main/Sonidos/rocket_launch.mp3" preload="auto"></audio>
+
+<div id="overlay">
+  <div class="overlay-card">
+
+    
+    <button class="music-floating" onclick="toggleMusic()">♫</button>
+    
+
+    <div class="cover-title">🐾UNA MICHI AVENTURA ESPACIAL🚀</div>
+
+   <img src="https://raw.githubusercontent.com/coderhouse2025-droid/MichiPlay/main/Maat_Astronauta.png" class="hero-img">
+
+    <div class="overlay-title" id="overlayTitle">
+      MAAT ASTRONAUTA
+    </div>
+
+    <div class="overlay-sub" id="overlaySub">
+      ☆ Gata espacial en busca de ovillos ☆<br><br>
+      <span style="color:rgba(34,211,238,0.7)">
+        ← → mover · ↑ / espacio saltar
+      </span>
+    </div>
+
+    <div class="overlay-score-big" id="overlayScore" style="display:none"></div>
+
+    <div id="btnGroup" style="display:flex; flex-direction:column; align-items:stretch; width:85%; margin:0 auto; gap:14px;">
+      <button class="btn-launch" id="playBtn" onclick="startGame()" style="width:100%!important;">
+        🚀 LANZAR MISIÓN
+      </button>
+      <button id="overlayExitBtn" onclick="exitGame()" class="btn-launch" style="display:none; width:100%!important;">EXIT</button>
+    </div>
+
+  </div>
+</div>
+
+
+<audio id="miauSound" src="https://raw.githubusercontent.com/coderhouse2025-droid/MichiPlay/main/Sonidos/MIAU.mp3" preload="auto"></audio>
+
+
+<div id="touchControls">
+
+  <div class="t-dpad">
+    <div class="t-btn" id="btnLeft">◀</div>
+    <div class="t-btn" id="btnRight">▶</div>
+  </div>
+  <div class="t-btn t-jump" id="btnJump">↑</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  MAAT ASTRONAUTA — Space Edition
+// ═══════════════════════════════════════════════════════════
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let W, H, S; // S = scale factor
+
+// ── AUDIO ENGINE (SFX) ──────────────────────────────────
+let audioCtx = null;
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+// Música de fondo con archivo externo
+let musicOn = false;
+const bgMusic = document.getElementById('musicaFondo');
+
+function playSpaceMusic() {
+  if (!bgMusic) return;
+  bgMusic.volume = 0.08;
+  const playPromise = bgMusic.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(err => console.log("Error reproduciendo música de fondo:", err));
+  }
+}
+
+function stopSpaceMusic() {
+  if (!bgMusic) return;
+  bgMusic.pause();
+  bgMusic.currentTime = 0;
+}
+
+
+function playSFX(type) {
+  if (!audioCtx) return;
+
+  const ctx2 = audioCtx;
+
+  if (type === 'collect') {
+    const miau = document.getElementById('miauSound');
+    if (miau) {
+      miau.currentTime = 0;
+      miau.volume = 0.45;
+      const playPromise = miau.play();
+      if(playPromise !== undefined){
+        playPromise.catch(err=>console.log(err));
+      }
+    }
+
+    [880,1100,1320].forEach((f,i) => {
+      const o = ctx2.createOscillator();
+      const g = ctx2.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      g.gain.value = 0.08;
+      g.gain.setTargetAtTime(0, ctx2.currentTime + 0.05 + i*0.04, 0.05);
+      o.connect(g);
+      g.connect(ctx2.destination);
+      o.start(ctx2.currentTime + i * 0.06);
+      o.stop(ctx2.currentTime + 0.3 + i * 0.06);
+    });
+  }
+
+  else if (type === 'hurt') {
+    const o = ctx2.createOscillator();
+    const g = ctx2.createGain();
+    o.type = 'sawtooth';
+    o.frequency.value = 220;
+    o.frequency.setTargetAtTime(55, ctx2.currentTime, 0.15);
+    g.gain.value = 0.15;
+    g.gain.setTargetAtTime(0, ctx2.currentTime + 0.1, 0.1);
+    o.connect(g);
+    g.connect(ctx2.destination);
+    o.start();
+    o.stop(ctx2.currentTime + 0.4);
+  }
+
+  else if (type === 'jump') {
+    const o = ctx2.createOscillator();
+    const g = ctx2.createGain();
+    o.type = 'triangle';
+    o.frequency.value = 300;
+    o.frequency.setTargetAtTime(600, ctx2.currentTime, 0.08);
+    g.gain.value = 0.07;
+    g.gain.setTargetAtTime(0, ctx2.currentTime + 0.05, 0.06);
+    o.connect(g);
+    g.connect(ctx2.destination);
+    o.start();
+    o.stop(ctx2.currentTime + 0.2);
+  }
+
+  else if (type === 'levelup') {
+    [523,659,784,1047].forEach((f,i) => {
+      const o = ctx2.createOscillator();
+      const g = ctx2.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      g.gain.value = 0.1;
+      g.gain.setTargetAtTime(0, ctx2.currentTime + 0.15 + i*0.1, 0.08);
+      o.connect(g);
+      g.connect(ctx2.destination);
+      o.start(ctx2.currentTime + i * 0.12);
+      o.stop(ctx2.currentTime + 0.5 + i * 0.12);
+    });
+  }
+}
+
+
+
+// ── THEME COLOR MANAGER ───────────────────────────────────
+const themes = {
+  1: { // Órbita 1 - Azul cian
+    accent: '#22d3ee', accent2: '#7c3aed', suit: '#dde8f5', suitDark: '#8fa8c8',
+    platformBase: '#9aafc8', platformGlow: 'rgba(34,211,238,0.25)',
+    groundBase: '#8090a8', groundDark: '#4a5568',
+    moonGlow: 'rgba(200,216,240,0.4)', yarnGlow: 'rgba(167,139,250,0.8)',
+    particleColors: ['#ffe97a','#22d3ee','#a78bfa','#fff','#f9a8d4'],
+    bgHue: 230, nebulaHue: 260
+  },
+  2: { // Luna - Morado
+    accent: '#c084fc', accent2: '#db2777', suit: '#f0e6ff', suitDark: '#b09cc8',
+    platformBase: '#b09cc8', platformGlow: 'rgba(192,132,252,0.3)',
+    groundBase: '#7e6b9a', groundDark: '#4a3f60',
+    moonGlow: 'rgba(200,180,240,0.5)', yarnGlow: 'rgba(192,132,252,0.8)',
+    particleColors: ['#ffe97a','#c084fc','#db2777','#fff','#f9a8d4'],
+    bgHue: 250, nebulaHue: 280
+  },
+  3: { // Asteroide - Rojo/naranja
+    accent: '#fb923c', accent2: '#ef4444', suit: '#ffe4d0', suitDark: '#d4a080',
+    platformBase: '#c8906a', platformGlow: 'rgba(251,146,60,0.3)',
+    groundBase: '#a87050', groundDark: '#5a3a2a',
+    moonGlow: 'rgba(255,180,130,0.5)', yarnGlow: 'rgba(251,146,60,0.8)',
+    particleColors: ['#ffe97a','#fb923c','#ef4444','#fff','#fed7aa'],
+    bgHue: 20, nebulaHue: 30
+  },
+  4: { // Nebulosa - Verde
+    accent: '#34d399', accent2: '#059669', suit: '#d0f0e0', suitDark: '#80b8a0',
+    platformBase: '#8ab8a0', platformGlow: 'rgba(52,211,153,0.3)',
+    groundBase: '#609070', groundDark: '#2a4030',
+    moonGlow: 'rgba(150,220,200,0.5)', yarnGlow: 'rgba(52,211,153,0.8)',
+    particleColors: ['#ffe97a','#34d399','#059669','#fff','#a7f3d0'],
+    bgHue: 160, nebulaHue: 170
+  },
+  5: { // Abismo - Dorado/ámbar
+    accent: '#fbbf24', accent2: '#d97706', suit: '#fff8e0', suitDark: '#c8b080',
+    platformBase: '#c8b878', platformGlow: 'rgba(251,191,36,0.3)',
+    groundBase: '#a09048', groundDark: '#4a4020',
+    moonGlow: 'rgba(255,220,100,0.5)', yarnGlow: 'rgba(251,191,36,0.8)',
+    particleColors: ['#ffe97a','#fbbf24','#d97706','#fff','#fde68a'],
+    bgHue: 45, nebulaHue: 50
+  }
+};
+
+let currentTheme = themes[1];
+
+function applyTheme(level) {
+  const theme = themes[Math.min(level, 5)] || themes[1];
+  currentTheme = theme;
+  
+  document.querySelectorAll('.hud-pill').forEach(el => {
+    el.style.borderColor = theme.accent + '44';
+    el.style.boxShadow = `0 0 20px ${theme.accent}22, inset 0 1px 0 rgba(255,255,255,0.08)`;
+  });
+  document.getElementById('levelDisplay').style.color = theme.accent;
+  document.getElementById('levelDisplay').style.textShadow = `0 0 10px ${theme.accent}88`;
+  
+  const btn = document.querySelector('.btn-launch');
+  if (btn) btn.style.background = `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})`;
+  
+  const card = document.querySelector('.overlay-card');
+  if (card) card.style.borderColor = theme.accent + '44';
+  
+  const musicBtn = document.getElementById('musicBtn');
+  if (musicBtn) musicBtn.style.borderColor = theme.accent + '44';
+  
+  document.querySelectorAll('.t-btn').forEach(el => {
+    el.style.borderColor = theme.accent + '44';
+    el.style.color = theme.accent;
+  });
+}
+
+// ── DEVICE DETECTION (antes de resize) ──────────────────
+// Detección estricta: solo userAgent móvil real, NO laptops táctiles
+function isMobileDevice() {
+  const ua = navigator.userAgent;
+  const isMobileUA = /Mobi|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  const isTabletUA = /iPad|Tablet/i.test(ua) && !/Macintosh/i.test(ua);
+  // Excluir laptops táctiles Windows/Mac aunque tengan maxTouchPoints
+  return isMobileUA || isTabletUA;
+}
+
+// ── RESIZE ────────────────────────────────────────────────
+const CTRL_H = 90; // altura del dock de controles (solo mobile)
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  // Solo en mobile real recortamos el canvas para el dock
+  const ctrlBar = isMobileDevice() ? CTRL_H : 0;
+  H = canvas.height = window.innerHeight - ctrlBar;
+  S = Math.min(W / 620, H / 420);
+  if (gameRunning) rebuildLevel();
+}
+
+window.addEventListener('resize', resize);
+
+// ── STATE ─────────────────────────────────────────────────
+let score = 0, lives = 3, level = 1;
+let gameRunning = false;
+let particles = [], shootingStars = [], moonCraters = [];
+let platforms = [], hazards = [], yarnBall = {};
+let maat = {};
+let invincibleTimer = 0, jumpRequested = false;
+let keys = { left: false, right: false };
+let frameCount = 0;
+let levelClearing = false, levelClearTimer = 0;
+let yarnsThisLevel = 0, levelCfg = {};
+let bgStars = [], nebulae = [];
+let gameWinning = false, winTimer = 0, spaceshipY = 0;
+const TOTAL_YARNS_FOR_WIN = 12;
+
+// Mobile touch — solo en dispositivos móviles reales (no laptops táctiles)
+const isMobile = isMobileDevice();
+if (isMobile) document.getElementById('touchControls').classList.add('active');
+
+// Prevenir scroll/zoom en toda la página durante el juego
+document.addEventListener('touchmove', e => { if(gameRunning) e.preventDefault(); }, {passive:false});
+document.addEventListener('gesturestart', e => e.preventDefault(), {passive:false});
+
+function setupTouch() {
+  // Botones D-pad y salto
+  const bind = (id, down, up) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const onDown = e => { e.preventDefault(); e.stopPropagation(); el.classList.add('pressed'); down(); };
+    const onUp   = e => { e.preventDefault(); e.stopPropagation(); el.classList.remove('pressed'); if(up) up(); };
+    el.addEventListener('touchstart',  onDown, {passive:false});
+    el.addEventListener('touchend',    onUp,   {passive:false});
+    el.addEventListener('touchcancel', onUp,   {passive:false});
+    el.addEventListener('mousedown', onDown);
+    el.addEventListener('mouseup',   onUp);
+    el.addEventListener('mouseleave',onUp);
+  };
+  bind('btnLeft',  () => keys.left=true,      () => keys.left=false);
+  bind('btnRight', () => keys.right=true,     () => keys.right=false);
+  bind('btnJump',  () => { jumpRequested=true; document.getElementById('btnJump').classList.add('pressed'); },
+                   () => document.getElementById('btnJump').classList.remove('pressed'));
+
+  // Swipe sobre el canvas: deslizar izq/der para moverse, arriba para saltar
+  let swipeStartX = 0, swipeStartY = 0, swipeActive = false;
+  const SWIPE_THRESHOLD = 28; // px mínimo para considerar swipe
+  canvas.addEventListener('touchstart', e => {
+    if (!gameRunning) return;
+    const t = e.touches[0];
+    swipeStartX = t.clientX;
+    swipeStartY = t.clientY;
+    swipeActive = true;
+  }, {passive:true});
+
+  canvas.addEventListener('touchmove', e => {
+    if (!gameRunning || !swipeActive) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    const dx = t.clientX - swipeStartX;
+    const dy = t.clientY - swipeStartY;
+    // Movimiento horizontal
+    if (Math.abs(dx) > SWIPE_THRESHOLD) {
+      keys.left  = dx < 0;
+      keys.right = dx > 0;
+    }
+    // Swipe hacia arriba = salto
+    if (dy < -SWIPE_THRESHOLD && Math.abs(dy) > Math.abs(dx)) {
+      jumpRequested = true;
+      swipeStartY = t.clientY; // reset para no re-disparar
+    }
+  }, {passive:false});
+
+  canvas.addEventListener('touchend', e => {
+    swipeActive = false;
+    // Solo limpia movimiento si no hay botones D-pad activos
+    if (!document.getElementById('btnLeft').classList.contains('pressed'))  keys.left = false;
+    if (!document.getElementById('btnRight').classList.contains('pressed')) keys.right = false;
+  }, {passive:true});
+
+  canvas.addEventListener('touchcancel', () => {
+    swipeActive = false;
+    keys.left = false; keys.right = false;
+  }, {passive:true});
+}
+setupTouch();
+
+window.addEventListener('keydown', e => {
+  if (e.key==='ArrowLeft'||e.key==='a') keys.left=true;
+  if (e.key==='ArrowRight'||e.key==='d') keys.right=true;
+  if (e.key===' '||e.key==='ArrowUp'||e.key==='w') { e.preventDefault(); jumpRequested=true; }
+  if ((e.key==='r'||e.key==='R') && !gameRunning) startGame();
+});
+window.addEventListener('keyup', e => {
+  if (e.key==='ArrowLeft'||e.key==='a') keys.left=false;
+  if (e.key==='ArrowRight'||e.key==='d') keys.right=false;
+});
+
+// ── LEVEL CONFIG ─────────────────────────────────────────
+function getLevelCfg(l) {
+  const b = l - 1;
+  return {
+    yarnsNeeded: 4 + b * 2,
+    hazardSpeed: (0.4 + b * 0.35) * S,
+    moonPhase: ['🌕','🌖','🌗','🌘','🌑'][Math.min(b,4)],
+    bgDarkness: Math.min(b * 0.12, 0.5),
+    orbitLabel: ['ÓRBITA 1','LUNA','ASTEROIDE','NEBULOSA','ABISMO'][Math.min(b,4)],
+  };
+}
+
+// ── BUILD LEVEL ──────────────────────────────────────────
+function rebuildLevel() {
+  levelCfg = getLevelCfg(level);
+  applyTheme(level);
+  const ph = 13 * S;
+
+  const raw = [
+    [0.02, 0.88, 0.20, ph], [0.25, 0.83, 0.17, ph], [0.46, 0.88, 0.18, ph],
+    [0.68, 0.85, 0.17, ph], [0.82, 0.90, 0.16, ph],
+    [0.03, 0.72, 0.14, ph], [0.22, 0.67, 0.14, ph], [0.42, 0.70, 0.12, ph],
+    [0.60, 0.68, 0.14, ph], [0.78, 0.72, 0.13, ph],
+    [0.10, 0.54, 0.12, ph], [0.32, 0.52, 0.11, ph], [0.55, 0.54, 0.12, ph],
+    [0.74, 0.56, 0.11, ph],
+    [0.20, 0.38, 0.10, ph], [0.46, 0.36, 0.10, ph], [0.68, 0.40, 0.09, ph],
+  ];
+  platforms = raw.map(([rx,ry,rw,rh]) => ({ x:rx*W, y:ry*H, w:rw*W, h:rh }));
+  platforms.push({ x:0, y:H+10, w:W, h:20 });
+
+  const rawH = [
+    [0.27,0.805],[0.50,0.855],[0.72,0.825],
+    [0.26,0.640],[0.64,0.650],
+    [0.34,0.490],[0.77,0.535],
+  ];
+  hazards = rawH.map(([rx,ry],i) => {
+    const hh = 16*S, hw = 14*S;
+    return {
+      x: rx*W, y: ry*H - hh, w: hw, h: hh,
+      baseX: rx*W, dir: i%2===0 ? 1 : -1,
+      speed: levelCfg.hazardSpeed * (0.7 + i*0.15),
+      range: 22*S,
+      alienType: i % 3
+    };
+  });
+
+  bgStars = Array.from({length:180}, () => ({
+    x: Math.random()*W, y: Math.random()*H*0.85,
+    r: Math.random()*2+0.3,
+    alpha: Math.random()*0.8+0.2,
+    twinkle: Math.random()*Math.PI*2,
+    speed: Math.random()*0.04+0.01
+  }));
+
+  nebulae = Array.from({length:4}, () => ({
+    x: Math.random()*W, y: Math.random()*H*0.6,
+    rx: (80+Math.random()*120)*S, ry: (40+Math.random()*80)*S,
+    hue: currentTheme.nebulaHue + Math.random()*20 - 10,
+    alpha: 0.04 + Math.random()*0.06
+  }));
+
+  moonCraters = Array.from({length:8}, (_, i) => ({
+    x: (0.06+i*0.13)*W + (Math.random()-0.5)*20*S,
+    y: H - 6*S, r: (4+Math.random()*8)*S
+  }));
+
+  shootingStars = [];
+
+  // Actualizar color del dock según el tema del nivel
+  const dock = document.getElementById('touchControls');
+  if (dock) {
+    const h = currentTheme.bgHue || 220;
+    dock.style.background = `
+      radial-gradient(ellipse 70px 10px at  9% 30%, hsla(${h},30%,8%,0.7) 0%, transparent 70%),
+      radial-gradient(ellipse 45px  7px at 28% 55%, hsla(${h},25%,7%,0.5) 0%, transparent 70%),
+      radial-gradient(ellipse 55px  8px at 52% 35%, hsla(${h},30%,8%,0.6) 0%, transparent 70%),
+      radial-gradient(ellipse 40px  6px at 72% 50%, hsla(${h},25%,7%,0.5) 0%, transparent 70%),
+      radial-gradient(ellipse 60px  9px at 91% 30%, hsla(${h},30%,8%,0.6) 0%, transparent 70%),
+      linear-gradient(180deg,
+        hsl(${h},25%,38%) 0%,
+        hsl(${h},22%,30%) 18%,
+        hsl(${h},20%,22%) 45%,
+        hsl(${h},18%,12%) 100%
+      )
+    `;
+    dock.style.borderTopColor = `hsla(${h},40%,60%,0.3)`;
+  }
+
+  if (!maat.x) resetMaatPos();
+  respawnYarn();
+}
+
+function resetMaatPos() {
+  maat = {
+    x: 60*S, y: H*0.82,
+    vx:0, vy:0,
+    w: 30*S, h: 30*S,
+    grounded:false, facingRight:true,
+    jumpPower: -11*S, gravity: 0.55*S,
+    maxSpeed: 5*S, friction: 0.87, accel: 0.7*S
+  };
+}
+
+function respawnYarn() {
+  const safe = platforms.filter(p => p.y < H*0.95);
+  const p = safe[Math.floor(Math.random()*safe.length)];
+  let cx = p.x + p.w/2, cy = p.y - 11*S;
+  if (maat.x && Math.abs(maat.x - cx) < 40*S) cx = (cx + 120*S) % (W - 20*S);
+  yarnBall = { x:cx, y:cy, r:9*S, collected:false, bob:Math.random()*Math.PI*2, glow:0, spin:0 };
+}
+
+// ── PARTICLES ────────────────────────────────────────────
+function spawnParticles(x, y, colors, n=14) {
+  for (let i=0;i<n;i++) {
+    const a = Math.random()*Math.PI*2, spd = (1.5+Math.random()*4)*S;
+    particles.push({
+      x,y, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd - 2*S,
+      r:(2+Math.random()*4)*S,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      life:1, decay:0.03+Math.random()*0.04
+    });
+  }
+}
+
+function spawnCollectBurst(x,y) {
+  spawnParticles(x,y, currentTheme.particleColors, 22);
+}
+function spawnHurtBurst(x,y) { spawnParticles(x,y,['#ef4444','#f97316','#fff'],10); }
+function spawnJumpDust(x,y) { spawnParticles(x,y,['rgba(200,216,240,0.6)','rgba(120,160,200,0.4)'],5); }
+
+function spawnShootingStar() {
+  if (shootingStars.length > 3) return;
+  shootingStars.push({
+    x: Math.random()*W*0.7, y: Math.random()*H*0.3,
+    vx: (3+Math.random()*4)*S, vy: (1.5+Math.random()*2)*S,
+    len: (30+Math.random()*60)*S, life:1
+  });
+}
+
+// ── LOGIC ────────────────────────────────────────────────
+function updateGame() {
+  canvas.style.transform = `translateY(${Math.sin(frameCount * 0.01) * 2}px)`;
+  frameCount++;
+  if (frameCount % 180 === 0) spawnShootingStar();
+
+  for (const s of bgStars) {
+    s.twinkle += s.speed;
+    s.alpha = 0.25 + 0.65 * Math.abs(Math.sin(s.twinkle));
+  }
+
+  for (let i=shootingStars.length-1;i>=0;i--) {
+    const ss = shootingStars[i];
+    ss.x += ss.vx; ss.y += ss.vy; ss.life -= 0.015;
+    if (ss.life <= 0 || ss.x > W || ss.y > H) shootingStars.splice(i,1);
+  }
+
+  if (gameWinning) {
+    winTimer++;
+
+    // Fases del final cinematográfico
+    // 0-80:   nave aterriza suavemente desde arriba
+    // 80-160: Maat camina hacia la nave y sube
+    // 160-220: ignición (fuego parpadea)
+    // 220-340: despegue vertical lento
+    // 340+:   pantalla de victoria
+
+    // Destino: la nave baja hasta cerca del suelo donde está Maat
+    // El "fondo" de la nave (35*S por debajo del centro) debe tocar H - 55*S (encima del suelo)
+    const landingY = H - 90*S; // centro de la nave al aterrizar
+
+    if (winTimer <= 90) {
+      // Fase 1: nave baja desde arriba hasta el suelo
+      const t = winTimer / 90;
+      const easedT = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+      spaceshipY = -120*S + easedT * (landingY + 120*S);
+    } else if (winTimer <= 240) {
+      // Fase 2: nave posada, Maat aborda
+      spaceshipY = landingY;
+    } else {
+      // Fase 3: despegue vertical con aceleración progresiva
+      const t = (winTimer - 240) / 100;
+      spaceshipY = landingY - t * t * (H + 300*S);
+    }
+
+    // Dispara sonido del cohete al inicio de la ignición (fase 3)
+    if (winTimer === 181) {
+      const rocketSnd = document.getElementById('rocketSound');
+      if (rocketSnd) { rocketSnd.currentTime = 0; rocketSnd.play().catch(()=>{}); }
+      // Baja música de fondo durante el despegue
+      const bg = document.getElementById('musicaFondo');
+      if (bg) bg.volume = 0.03;
+    }
+
+    // La nave sale de pantalla alrededor de winTimer ~400
+    // Mostramos el texto en canvas desde ~380 y el overlay mucho después
+    if (winTimer > 520) {
+      gameRunning = false;
+      returnToPortrait();
+      document.getElementById('overlay').classList.remove('hidden');
+      document.getElementById('overlayTitle').textContent = '🐱 MICHI MISIÓN CUMPLIDA 🚀';
+      document.getElementById('overlaySub').textContent = '¡Maat recogió todos los ovillos y despegó hacia las estrellas!';
+      document.getElementById('overlayScore').style.display = 'block';
+      document.getElementById('overlayScore').textContent = `🧶 Ovillos totales: ${score}`;
+      document.getElementById('playBtn').textContent = '🔄 JUGAR DE NUEVO';
+      document.getElementById('overlayExitBtn').style.display = 'block';
+      document.getElementById('inGameExitBtn').style.display = 'none';
+      stopSpaceMusic();
+      musicOn = false;
+      document.getElementById('musicBtn').textContent = '🔇';
+      return;
+    }
+  }
+
+  if (levelClearing) {
+    levelClearTimer--;
+    if (levelClearTimer <= 0) {
+      if (level === 5 && score >= TOTAL_YARNS_FOR_WIN) {
+        levelClearing = false;
+        gameWinning = true;
+        winTimer = 0;
+        spaceshipY = H + 100*S;
+        showFloat(W/2, H/2, '🚀 ¡MISIÓN CUMPLIDA!');
+        playSFX('levelup');
+        return;
+      } else {
+        nextLevel();
+      }
+    }
+    return;
+  }
+
+  for (const h of hazards) {
+    h.x += h.speed * h.dir;
+    if (Math.abs(h.x - h.baseX) > h.range) h.dir *= -1;
+  }
+
+  if (keys.left) { maat.vx = Math.max(-maat.maxSpeed, maat.vx - maat.accel); maat.facingRight = false; }
+  if (keys.right) { maat.vx = Math.min(maat.maxSpeed, maat.vx + maat.accel); maat.facingRight = true; }
+  if (!keys.left && !keys.right) { maat.vx *= maat.friction; if(Math.abs(maat.vx)<0.1) maat.vx=0; }
+
+  maat.vy += maat.gravity;
+  maat.x += maat.vx; maat.y += maat.vy;
+
+  if (maat.x < 0) { maat.x=0; maat.vx=0; }
+  if (maat.x+maat.w > W) { maat.x=W-maat.w; maat.vx=0; }
+
+  maat.grounded = false;
+  for (const p of platforms) {
+    const prevBot = maat.y + maat.h - maat.vy;
+    if (maat.vy >= 0 && maat.x+maat.w > p.x+4 && maat.x < p.x+p.w-4 &&
+        prevBot <= p.y+3 && maat.y+maat.h >= p.y) {
+      maat.y = p.y - maat.h; maat.vy = 0; maat.grounded = true;
+    }
+  }
+
+  if (maat.y > H+60) { hurtMaat(); resetMaatPos(); }
+
+  // Colisión con el suelo del canvas — Maat nunca se corta
+  const GROUND_Y = H - maat.h - 2*S;
+  if (maat.y >= GROUND_Y) {
+    maat.y = GROUND_Y;
+    maat.vy = 0;
+    maat.grounded = true;
+    maat.onGroundLevel = true;
+  } else {
+    maat.onGroundLevel = false;
+  }
+
+  // Salto — se evalúa DESPUÉS de todas las colisiones para que grounded sea correcto
+  if (jumpRequested && maat.grounded) {
+    maat.vy = maat.jumpPower; maat.grounded = false;
+    maat.onGroundLevel = false;
+    jumpRequested = false;
+    spawnJumpDust(maat.x+maat.w/2, maat.y+maat.h);
+    playSFX('jump');
+  }
+  jumpRequested = false;
+
+  if (invincibleTimer <= 0) {
+    for (const h of hazards) {
+      if (maat.x+maat.w>h.x+4 && maat.x<h.x+h.w-4 && maat.y+maat.h>h.y+4 && maat.y<h.y+h.h-4) {
+        hurtMaat();
+        maat.vx = maat.facingRight ? -5*S : 5*S;
+        maat.vy = -6*S;
+        break;
+      }
+    }
+  }
+  if (invincibleTimer > 0) invincibleTimer--;
+
+  yarnBall.bob += 0.07; yarnBall.spin += 0.03;
+  yarnBall.glow = 0.5 + 0.5*Math.sin(frameCount*0.09);
+  if (!yarnBall.collected) {
+    const dy = maat.y+maat.h/2 - yarnBall.y;
+    const dx = maat.x+maat.w/2 - yarnBall.x;
+    if (Math.sqrt(dx*dx+dy*dy) < yarnBall.r + maat.w/2 - 4) {
+      yarnBall.collected = true;
+      score++; yarnsThisLevel++;
+      updateHUD();
+      spawnCollectBurst(yarnBall.x, yarnBall.y);
+      showFloat(yarnBall.x, yarnBall.y, '+1 🧶');
+      playSFX('collect');
+
+      canvas.style.filter = 'brightness(1.25)';
+      setTimeout(() => { canvas.style.filter = 'brightness(1)'; }, 90);
+
+      if (score % 8 === 0 && lives < 5) {
+        lives++; updateHUD(true);
+        showFloat(maat.x, maat.y - 20*S, '❤️ +Vida');
+      }
+      if (yarnsThisLevel >= levelCfg.yarnsNeeded) {
+        if (level === 5 && score >= TOTAL_YARNS_FOR_WIN) {
+          levelClearing = true; levelClearTimer = 120;
+          showFloat(W/2, H/2, '🌟 ¡ABISMO SUPERADO!');
+          playSFX('levelup');
+        } else {
+          levelClearing = true; levelClearTimer = 100;
+          showFloat(W/2, H/2, `🌟 ¡${levelCfg.orbitLabel} superada!`);
+          playSFX('levelup');
+        }
+      } else {
+        setTimeout(respawnYarn, 500);
+      }
+    }
+  }
+
+  for (let i=particles.length-1;i>=0;i--) {
+    const p=particles[i];
+    p.x+=p.vx; p.y+=p.vy; p.vy+=0.18*S; p.life-=p.decay;
+    if(p.life<=0) particles.splice(i,1);
+  }
+}
+
+function hurtMaat() {
+  lives--; invincibleTimer = 75;
+  spawnHurtBurst(maat.x+maat.w/2, maat.y+maat.h/2);
+  updateHUD();
+  playSFX('hurt');
+  document.getElementById('hud').classList.add('hud-shake');
+  setTimeout(()=>document.getElementById('hud').classList.remove('hud-shake'),400);
+  if (lives<=0) { lives=0; endGame(); }
+}
+
+function nextLevel() {
+  level++; yarnsThisLevel=0; levelClearing=false;
+  maat.x=0;
+  rebuildLevel();
+  maat.x=60*S; maat.y=H*0.82; maat.vx=0; maat.vy=0;
+  updateHUD();
+}
+
+// ── DRAW ─────────────────────────────────────────────────
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  drawSpace();
+  drawPlatforms();
+  drawHazards();
+  if (!yarnBall.collected) drawYarn();
+  drawParticles();
+  if (!gameWinning) drawMaat();
+  drawProgressBar();
+  if (gameWinning) drawSpaceship();
+}
+
+function drawSpace() {
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  const dark = levelCfg.bgDarkness || 0;
+  const hue = currentTheme.bgHue;
+  grad.addColorStop(0, `hsl(${hue},${60-dark*30}%,${6+dark*2}%)`);
+  grad.addColorStop(0.5, `hsl(${hue+10},${50-dark*25}%,${10+dark*2}%)`);
+  grad.addColorStop(1, `hsl(${hue-10},${40-dark*20}%,${16+dark*3}%)`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,W,H);
+
+  for (const n of nebulae) {
+    ctx.save();
+    ctx.globalAlpha = n.alpha;
+    const ng = ctx.createRadialGradient(n.x,n.y,0, n.x,n.y,n.rx);
+    ng.addColorStop(0, `hsla(${n.hue},80%,70%,1)`);
+    ng.addColorStop(1, `hsla(${n.hue},60%,40%,0)`);
+    ctx.fillStyle = ng;
+    ctx.save();
+    ctx.translate(n.x,n.y); ctx.scale(1, n.ry/n.rx); ctx.translate(-n.x,-n.y);
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.rx,0,Math.PI*2); ctx.fill();
+    ctx.restore(); ctx.restore();
+  }
+
+  for (const s of bgStars) {
+    ctx.globalAlpha = s.alpha;
+    ctx.fillStyle = s.r > 1.5 ? '#ffe97a' : '#fff';
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  for (const ss of shootingStars) {
+    ctx.save(); ctx.globalAlpha = ss.life * 0.8;
+    const sg = ctx.createLinearGradient(ss.x-ss.vx*8,ss.y-ss.vy*8, ss.x,ss.y);
+    sg.addColorStop(0,'rgba(255,255,255,0)');
+    sg.addColorStop(1,'rgba(200,230,255,0.9)');
+    ctx.strokeStyle = sg; ctx.lineWidth = 2*S;
+    ctx.beginPath(); ctx.moveTo(ss.x-ss.vx*12,ss.y-ss.vy*12); ctx.lineTo(ss.x,ss.y); ctx.stroke();
+    ctx.restore();
+  }
+
+  const mx = W*0.82, my = H*0.15, mr = 55*S;
+  const moonGrad = ctx.createRadialGradient(mx-mr*0.3,my-mr*0.3,0, mx,my,mr);
+  moonGrad.addColorStop(0,'#f0f4ff');
+  moonGrad.addColorStop(0.5, currentTheme.suit);
+  moonGrad.addColorStop(1, currentTheme.suitDark);
+  ctx.fillStyle = moonGrad;
+  ctx.shadowBlur = 25*S; ctx.shadowColor = currentTheme.moonGlow;
+  ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(100,130,170,0.35)';
+  [[0.3,0.2,0.18],[0.6,0.55,0.12],[0.2,0.65,0.08],[0.7,0.25,0.09]].forEach(([fx,fy,fr]) => {
+    ctx.beginPath(); ctx.arc(mx+fx*mr*2-mr, my+fy*mr*2-mr, fr*mr, 0, Math.PI*2); ctx.fill();
+  });
+
+  // El suelo lo dibuja el dock CSS — el canvas llega hasta su borde sin franja
+  // Solo dibujamos el borde superior del suelo para que haya transición visual
+  const gy = H - 6*S;
+  const edgeGrad = ctx.createLinearGradient(0, gy-4*S, 0, H);
+  edgeGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  edgeGrad.addColorStop(0.4, currentTheme.groundBase + 'cc');
+  edgeGrad.addColorStop(1, currentTheme.groundDark);
+  ctx.fillStyle = edgeGrad;
+  ctx.fillRect(0, gy - 4*S, W, H - gy + 8*S);
+
+  // cráteres del suelo (solo en mobile — el dock los continúa)
+  ctx.fillStyle = 'rgba(50,60,80,0.5)';
+  for (const c of moonCraters) {
+    ctx.beginPath(); ctx.ellipse(c.x,c.y,c.r,c.r*0.35,0,0,Math.PI*2); ctx.fill();
+  }
+}
+
+function drawPlatforms() {
+  for (const p of platforms) {
+    if (p.y >= H) continue;
+    ctx.shadowBlur = 12*S; ctx.shadowColor = currentTheme.platformGlow;
+    const pg = ctx.createLinearGradient(p.x,p.y,p.x,p.y+p.h);
+    pg.addColorStop(0, currentTheme.platformBase);
+    pg.addColorStop(0.4, currentTheme.suitDark);
+    pg.addColorStop(1, '#4a5a70');
+    ctx.fillStyle = pg;
+    roundRect(p.x,p.y,p.w,p.h,5*S);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = currentTheme.platformGlow;
+    ctx.fillRect(p.x+3*S,p.y,p.w-6*S,2.5*S);
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    const veins = Math.floor(p.w/(22*S));
+    for (let i=0;i<veins;i++) ctx.fillRect(p.x+8*S+i*20*S, p.y+3*S, 2.5*S, p.h-5*S);
+    ctx.fillStyle = 'rgba(180,200,220,0.2)';
+    for (let i=0;i<3;i++) ctx.fillRect(p.x+(i*0.3+0.1)*p.w, p.y-2*S, 4*S, 2*S);
+  }
+}
+
+function drawHazards() {
+  for (const h of hazards) drawAlien(h);
+}
+
+function drawAlien(h) {
+  const cx = h.x + h.w/2, cy = h.y + h.h/2, s = S;
+  ctx.save();
+  ctx.translate(cx, cy);
+  
+  let bodyColor, eyeColor, antennaColor, glowColor;
+  if (h.alienType === 0) {
+    bodyColor = '#4ade80'; eyeColor = '#facc15'; antennaColor = '#22c55e'; glowColor = 'rgba(74,222,128,0.5)';
+  } else if (h.alienType === 1) {
+    bodyColor = '#c084fc'; eyeColor = '#f472b6'; antennaColor = '#a855f7'; glowColor = 'rgba(192,132,252,0.5)';
+  } else {
+    bodyColor = '#f87171'; eyeColor = '#fbbf24'; antennaColor = '#ef4444'; glowColor = 'rgba(248,113,113,0.5)';
+  }
+
+  ctx.shadowBlur = 12*s; ctx.shadowColor = glowColor;
+  ctx.fillStyle = bodyColor;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, h.w/2 - 1, h.h/2 - 1, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.beginPath();
+  ctx.ellipse(0, 2*s, h.w*0.35, h.h*0.35, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  const eyeXOffset = h.w * 0.25, eyeY = -h.h * 0.15, eyeR = h.w * 0.28;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(-eyeXOffset, eyeY, eyeR, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(eyeXOffset, eyeY, eyeR, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#1a1a1a';
+  ctx.beginPath(); ctx.ellipse(-eyeXOffset, eyeY, eyeR*0.45, eyeR*0.7, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(eyeXOffset, eyeY, eyeR*0.45, eyeR*0.7, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.beginPath(); ctx.arc(-eyeXOffset - eyeR*0.2, eyeY - eyeR*0.3, eyeR*0.25, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(eyeXOffset - eyeR*0.2, eyeY - eyeR*0.3, eyeR*0.25, 0, Math.PI*2); ctx.fill();
+
+  ctx.strokeStyle = antennaColor;
+  ctx.lineWidth = 2*s;
+  ctx.lineCap = 'round';
+  const antennaBase = -h.h * 0.45, antennaTip = -h.h * 0.8, antennaSpread = h.w * 0.3;
+  ctx.beginPath();
+  ctx.moveTo(-antennaSpread*0.4, antennaBase);
+  ctx.quadraticCurveTo(-antennaSpread, antennaBase - 10*s, -antennaSpread*1.2, antennaTip);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(antennaSpread*0.4, antennaBase);
+  ctx.quadraticCurveTo(antennaSpread, antennaBase - 10*s, antennaSpread*1.2, antennaTip);
+  ctx.stroke();
+  ctx.fillStyle = eyeColor;
+  ctx.shadowBlur = 6*s; ctx.shadowColor = eyeColor;
+  ctx.beginPath(); ctx.arc(-antennaSpread*1.2, antennaTip, 3*s, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(antennaSpread*1.2, antennaTip, 3*s, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.strokeStyle = '#1a1a1a';
+  ctx.lineWidth = 1.5*s;
+  ctx.beginPath();
+  ctx.arc(0, eyeY + eyeR + 3*s, 4*s, 0.1, Math.PI - 0.1);
+  ctx.stroke();
+
+  ctx.fillStyle = bodyColor;
+  ctx.shadowBlur = 4*s; ctx.shadowColor = glowColor;
+  const armY = h.h * 0.2;
+  ctx.fillRect(-h.w*0.6, armY, 4*s, 6*s);
+  ctx.fillRect(h.w*0.6 - 4*s, armY, 4*s, 6*s);
+  ctx.shadowBlur = 0;
+  
+  ctx.restore();
+}
+
+function drawMaat() {
+  const x=maat.x, s=S;
+  const w=maat.w, h=maat.h;
+
+  // ── Modo acecho: en el suelo y moviéndose ──
+  const isMoving = Math.abs(maat.vx) > 0.5;
+  const isStalking = maat.onGroundLevel && isMoving;
+  const stalkPhase = frameCount * 0.18; // velocidad del paso sigiloso
+
+  // Comprimir verticalmente al acechar (cuerpo bajo, agachado)
+  const crouchY = isStalking ? 6*s : 0; // cuánto baja el cuerpo
+  const crouchScaleY = isStalking ? 0.72 : 1; // cuánto se aplana
+  const headBob = isStalking ? Math.sin(stalkPhase) * 2*s : 0; // cabeza oscila
+  const bodyShift = isStalking ? Math.sin(stalkPhase * 0.5) * 1.5*s : 0;
+
+  // y de referencia para el cuerpo (comprimido hacia abajo)
+  const by = x; // alias para claridad
+  const bodyY = maat.y + crouchY;
+  const bodyH = h * crouchScaleY;
+
+  if (invincibleTimer>0 && Math.floor(frameCount/4)%2===0) ctx.globalAlpha=0.4;
+
+  ctx.save();
+  if (!maat.facingRight) { ctx.translate(x+w,0); ctx.scale(-1,1); ctx.translate(-x,0); }
+
+  const suitColor = currentTheme.suit;
+  const suitDark = currentTheme.suitDark;
+  const accentColor = currentTheme.accent;
+
+  // ── Cola (primero, detrás del cuerpo) ──
+  // Al acechar: cola levantada y erguida en arco
+  const tailBaseX = x + w - 3*s;
+  const tailBaseY = bodyY + bodyH - 8*s;
+  ctx.lineWidth = 5*s; ctx.strokeStyle = suitDark; ctx.lineCap = 'round';
+  ctx.beginPath();
+  if (isStalking) {
+    // Cola erguida en S hacia arriba (sigilo)
+    ctx.moveTo(tailBaseX, tailBaseY);
+    ctx.bezierCurveTo(
+      tailBaseX + 16*s, tailBaseY - 20*s,
+      tailBaseX + 8*s,  tailBaseY - 40*s,
+      tailBaseX + 2*s,  tailBaseY - 52*s
+    );
+  } else {
+    ctx.moveTo(tailBaseX, tailBaseY);
+    ctx.quadraticCurveTo(tailBaseX + 10*s, tailBaseY - 22*s, tailBaseX + 4*s, tailBaseY - 5*s);
+  }
+  ctx.stroke();
+  ctx.lineWidth = 2.5*s; ctx.strokeStyle = accentColor; ctx.stroke();
+
+  // ── Patas sigilosas (visible solo en acecho) ──
+  if (isStalking) {
+    // 4 patitas dobladas, 2 adelante 2 atrás, animadas en fase
+    const legA = Math.sin(stalkPhase) * 5*s;
+    const legB = Math.sin(stalkPhase + Math.PI) * 5*s;
+    ctx.fillStyle = suitDark;
+    // Pata delantera izquierda
+    ctx.beginPath(); ctx.ellipse(x+7*s + legA, bodyY+bodyH+3*s, 4*s, 2.5*s, -0.3, 0, Math.PI*2); ctx.fill();
+    // Pata delantera derecha
+    ctx.beginPath(); ctx.ellipse(x+14*s + legB, bodyY+bodyH+3*s, 4*s, 2.5*s, 0.3, 0, Math.PI*2); ctx.fill();
+    // Pata trasera izquierda
+    ctx.beginPath(); ctx.ellipse(x+w-14*s - legA, bodyY+bodyH+3*s, 4*s, 2.5*s, 0.3, 0, Math.PI*2); ctx.fill();
+    // Pata trasera derecha
+    ctx.beginPath(); ctx.ellipse(x+w-7*s - legB, bodyY+bodyH+3*s, 4*s, 2.5*s, -0.3, 0, Math.PI*2); ctx.fill();
+    // Almohadillas
+    ctx.fillStyle = '#7c3aed';
+    [x+7*s+legA, x+14*s+legB, x+w-14*s-legA, x+w-7*s-legB].forEach(lx => {
+      ctx.beginPath(); ctx.ellipse(lx, bodyY+bodyH+5*s, 2.5*s, 1.5*s, 0, 0, Math.PI*2); ctx.fill();
+    });
+  }
+
+  // ── Cuerpo (traje) ──
+  ctx.shadowBlur = 8*s; ctx.shadowColor = accentColor + '44';
+  ctx.fillStyle = suitColor;
+  ctx.beginPath();
+  ctx.ellipse(x+w/2 + bodyShift, bodyY+bodyH*0.6, w/2-1, bodyH*0.38, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Banda del traje
+  ctx.fillStyle = accentColor;
+  ctx.fillRect(x+6*s, bodyY+bodyH*0.45, w-12*s, 4*s);
+
+  // Huella de gato en el pecho
+  const px2 = x + w/2 + bodyShift, py2 = bodyY + bodyH * 0.6;
+  ctx.fillStyle = '#ffe97a';
+  ctx.beginPath(); ctx.ellipse(px2, py2+1.2*s, 2.8*s, 2.2*s, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(px2-2.6*s, py2-1.4*s, 1.1*s, 0.85*s, -0.4, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(px2-0.8*s, py2-2.4*s, 1.0*s, 0.8*s,  -0.1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(px2+1.0*s, py2-2.4*s, 1.0*s, 0.8*s,   0.1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(px2+2.6*s, py2-1.4*s, 1.1*s, 0.85*s,  0.4, 0, Math.PI*2); ctx.fill();
+
+  // Brazos
+  ctx.fillStyle = suitDark;
+  ctx.fillRect(x-3*s, bodyY+bodyH*0.4, 5*s, bodyH*0.3);
+  ctx.fillRect(x+w-2*s, bodyY+bodyH*0.4, 5*s, bodyH*0.3);
+  ctx.fillStyle='#7c3aed';
+  ctx.beginPath(); ctx.arc(x-1.5*s, bodyY+bodyH*0.7, 3.5*s, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x+w+1.5*s, bodyY+bodyH*0.7, 3.5*s, 0, Math.PI*2); ctx.fill();
+
+  // Piernas (solo cuando NO está acechando)
+  if (!isStalking) {
+    ctx.fillStyle = suitDark;
+    ctx.fillRect(x+5*s, bodyY+bodyH*0.85, w*0.3, bodyH*0.2);
+    ctx.fillRect(x+w-5*s-w*0.3, bodyY+bodyH*0.85, w*0.3, bodyH*0.2);
+    ctx.fillStyle = '#374151';
+    ctx.fillRect(x+4*s, bodyY+bodyH-4*s, w*0.35, 4*s);
+    ctx.fillRect(x+w-4*s-w*0.35, bodyY+bodyH-4*s, w*0.35, 4*s);
+  }
+
+  // ── Casco ──
+  // Al acechar: casco inclinado hacia adelante (headBob)
+  const headX = x + w/2 + bodyShift;
+  const headY = isStalking ? bodyY - 4*s + headBob : maat.y - 2*s;
+
+  ctx.shadowBlur = 14*s; ctx.shadowColor = accentColor + '66';
+  ctx.fillStyle = suitDark;
+  ctx.beginPath(); ctx.arc(headX, headY, 14*s, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Cuello
+  ctx.fillStyle = suitDark;
+  ctx.fillRect(x+7*s, bodyY+bodyH*0.28, w-14*s, 5*s);
+
+  // Visor
+  const visGrad = ctx.createRadialGradient(headX-3*s, headY-3*s, 0, headX, headY, 11*s);
+  visGrad.addColorStop(0,'rgba(59,130,246,0.55)');
+  visGrad.addColorStop(0.6,'rgba(14,68,180,0.45)');
+  visGrad.addColorStop(1,'rgba(2,24,60,0.3)');
+  ctx.fillStyle = visGrad;
+  ctx.beginPath(); ctx.arc(headX, headY, 11*s, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath(); ctx.ellipse(headX-3*s, headY-6*s, 4*s, 2.5*s, -0.5, 0, Math.PI*2); ctx.fill();
+
+  // Cara
+  ctx.fillStyle = '#b09070';
+  ctx.beginPath(); ctx.arc(headX, headY, 8.5*s, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(80,55,30,0.45)';
+  for(let i=0;i<3;i++) ctx.fillRect(headX-5*s+i*3.2*s, headY-3*s, 1.8*s, 5*s);
+  ctx.fillStyle = '#e8dcc8';
+  ctx.beginPath(); ctx.ellipse(headX, headY+2*s, 5*s, 4*s, 0, 0, Math.PI*2); ctx.fill();
+
+  // Ojos — al acechar: entrecerrados (sigilo)
+  const eyeSquint = isStalking ? 0.55 : 1;
+  [headX-4*s, headX+4*s].forEach(ex => {
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(ex, headY-1*s, 3*s, 2.5*s*eyeSquint, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#8bc34a';
+    ctx.beginPath(); ctx.arc(ex, headY-1*s, 2*s*eyeSquint, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath(); ctx.arc(ex, headY-1*s, 1.1*s*eyeSquint, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.beginPath(); ctx.arc(ex+0.8*s, headY-2*s, 0.7*s, 0, Math.PI*2); ctx.fill();
+  });
+
+  // Nariz
+  ctx.fillStyle = '#e8748a';
+  ctx.beginPath();
+  ctx.moveTo(headX, headY+3*s);
+  ctx.lineTo(headX-2*s, headY+1.5*s);
+  ctx.lineTo(headX+2*s, headY+1.5*s);
+  ctx.closePath(); ctx.fill();
+
+  // Bigotes
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 0.8*s;
+  [[headX-2*s,headY+3*s,headX-9*s,headY+2*s],
+   [headX-2*s,headY+5*s,headX-8*s,headY+5.5*s],
+   [headX+2*s,headY+3*s,headX+9*s,headY+2*s],
+   [headX+2*s,headY+5*s,headX+8*s,headY+5.5*s]]
+    .forEach(([ax,ay,bx,by])=>{ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();});
+
+  // Orejas — al acechar: achatadas / pegadas (alerta)
+  ctx.fillStyle = '#b09070';
+  if (isStalking) {
+    // Orejas bajas hacia los lados (modo acecho)
+    ctx.beginPath(); ctx.moveTo(headX-8*s,headY-10*s); ctx.lineTo(headX-14*s,headY-15*s); ctx.lineTo(headX-3*s,headY-12*s); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(headX+8*s,headY-10*s); ctx.lineTo(headX+14*s,headY-15*s); ctx.lineTo(headX+3*s,headY-12*s); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#e8a090';
+    ctx.beginPath(); ctx.moveTo(headX-9*s,headY-11*s); ctx.lineTo(headX-13*s,headY-14*s); ctx.lineTo(headX-5*s,headY-12*s); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(headX+9*s,headY-11*s); ctx.lineTo(headX+13*s,headY-14*s); ctx.lineTo(headX+5*s,headY-12*s); ctx.closePath(); ctx.fill();
+  } else {
+    ctx.beginPath(); ctx.moveTo(x+5*s,headY-11*s); ctx.lineTo(x+10*s,headY-19*s); ctx.lineTo(x+15*s,headY-11*s); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x+w-5*s,headY-11*s); ctx.lineTo(x+w-10*s,headY-19*s); ctx.lineTo(x+w-15*s,headY-11*s); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#e8a090';
+    ctx.beginPath(); ctx.moveTo(x+7*s,headY-12*s); ctx.lineTo(x+10*s,headY-17*s); ctx.lineTo(x+13*s,headY-12*s); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x+w-7*s,headY-12*s); ctx.lineTo(x+w-10*s,headY-17*s); ctx.lineTo(x+w-13*s,headY-12*s); ctx.closePath(); ctx.fill();
+  }
+
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+
+function drawYarn() {
+  const bx = yarnBall.x, by = yarnBall.y + Math.sin(yarnBall.bob)*5*S;
+  const r = yarnBall.r;
+  ctx.shadowBlur = 20*S*yarnBall.glow; ctx.shadowColor=currentTheme.yarnGlow;
+  ctx.fillStyle=currentTheme.accent2;
+  ctx.beginPath(); ctx.arc(bx,by,r,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.save(); ctx.translate(bx,by); ctx.rotate(yarnBall.spin);
+  for (let i=0;i<4;i++) {
+    const a = (i/4)*Math.PI*2;
+    ctx.fillStyle=[currentTheme.accent, currentTheme.accent2, currentTheme.suit, currentTheme.accent][i];
+    ctx.beginPath();
+    ctx.ellipse(Math.cos(a)*r*0.4, Math.sin(a)*r*0.4, r*0.55, r*0.3, a, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+  ctx.fillStyle='rgba(255,233,122,0.9)';
+  for(let i=0;i<4;i++) {
+    const a=(i/4)*Math.PI*2 + frameCount*0.05;
+    drawStar4(bx+Math.cos(a)*(r+7*S), by+Math.sin(a)*(r+7*S), 2.5*S);
+  }
+}
+
+function drawStar4(x,y,r) {
+  ctx.save(); ctx.translate(x,y); ctx.rotate(frameCount*0.06);
+  ctx.beginPath();
+  for(let i=0;i<4;i++) {
+    const a=(i/4)*Math.PI*2-Math.PI/4;
+    const b=a+Math.PI/4;
+    i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+    ctx.lineTo(Math.cos(b)*r*0.4,Math.sin(b)*r*0.4);
+  }
+  ctx.closePath(); ctx.fill(); ctx.restore();
+}
+
+function drawParticles() {
+  for (const p of particles) {
+    ctx.globalAlpha=p.life;
+    ctx.fillStyle=p.color;
+    ctx.shadowBlur=6*S; ctx.shadowColor=p.color;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+  }
+  ctx.globalAlpha=1;
+}
+
+function drawProgressBar() {
+  const total=levelCfg.yarnsNeeded||4, done=Math.min(yarnsThisLevel,total);
+  const bw=140*S, bh=8*S, bx=W/2-bw/2, by=H-24*S;
+  ctx.fillStyle='rgba(0,0,0,0.5)'; roundRect(bx,by,bw,bh,4*S);
+  const pGrad=ctx.createLinearGradient(bx,0,bx+bw,0);
+  pGrad.addColorStop(0, currentTheme.accent);
+  pGrad.addColorStop(1, currentTheme.accent2);
+  ctx.fillStyle=pGrad; roundRect(bx,by,bw*(done/total),bh,4*S);
+  ctx.shadowBlur=8*S; ctx.shadowColor=currentTheme.accent + '88';
+  ctx.fillStyle=currentTheme.accent + '99';
+  roundRect(bx,by,bw*(done/total),3*S,2*S);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(200,216,240,0.6)';
+  ctx.font=`${9*S}px 'Orbitron', monospace`;
+  ctx.textAlign='center';
+  ctx.fillText(`${done}/${total} 🧶`, W/2, by-4*S);
+  ctx.textAlign='left';
+}
+
+function drawSpaceship() {
+  const s = S;
+  ctx.save();
+
+  // ── función interna: dibuja el módulo lunar fiel a la imagen ──
+  function drawLunarLander(cx, cy, ignition) {
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    const glow = 8 + ignition * 30;
+    ctx.shadowBlur = glow*s;
+    ctx.shadowColor = ignition > 0 ? 'rgba(255,180,0,0.9)' : 'rgba(200,160,60,0.4)';
+
+    // — Cúpula superior dorada —
+    const domeGrad = ctx.createRadialGradient(-6*s,-44*s,2*s, 0,-40*s,14*s);
+    domeGrad.addColorStop(0,'#ffe082'); domeGrad.addColorStop(0.5,'#b8860b'); domeGrad.addColorStop(1,'#5a4000');
+    ctx.fillStyle = domeGrad;
+    ctx.beginPath(); ctx.ellipse(0,-42*s,14*s,10*s,0,0,Math.PI*2); ctx.fill();
+    // antena
+    ctx.strokeStyle='#c8a020'; ctx.lineWidth=1.5*s; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(0,-52*s); ctx.lineTo(0,-44*s); ctx.stroke();
+    ctx.fillStyle='#ffe082'; ctx.beginPath(); ctx.arc(0,-53*s,2*s,0,Math.PI*2); ctx.fill();
+
+    // — Cuerpo principal (cónico trapezoidal) —
+    const bodyGrad = ctx.createLinearGradient(-26*s,0,26*s,0);
+    bodyGrad.addColorStop(0,'#3a3f4a'); bodyGrad.addColorStop(0.35,'#8a9098');
+    bodyGrad.addColorStop(0.55,'#c8ccd4'); bodyGrad.addColorStop(1,'#4a4f58');
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath();
+    ctx.moveTo(-14*s,-38*s); ctx.lineTo(-26*s,16*s);
+    ctx.lineTo(26*s,16*s);  ctx.lineTo(14*s,-38*s);
+    ctx.closePath(); ctx.fill();
+
+    // paneles laterales oscuros
+    ctx.fillStyle='rgba(20,25,35,0.55)';
+    ctx.beginPath(); ctx.moveTo(-24*s,4*s); ctx.lineTo(-14*s,4*s); ctx.lineTo(-12*s,16*s); ctx.lineTo(-22*s,16*s); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(24*s,4*s); ctx.lineTo(14*s,4*s); ctx.lineTo(12*s,16*s); ctx.lineTo(22*s,16*s); ctx.closePath(); ctx.fill();
+
+    // remaches / líneas de paneles
+    ctx.strokeStyle='rgba(180,190,210,0.3)'; ctx.lineWidth=0.8*s;
+    [-20*s,-8*s,0,8*s,20*s].forEach(lx => {
+      ctx.beginPath(); ctx.moveTo(lx,-36*s); ctx.lineTo(lx*1.5,14*s); ctx.stroke();
+    });
+    ctx.beginPath(); ctx.moveTo(-25*s,-14*s); ctx.lineTo(25*s,-14*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-25*s,2*s); ctx.lineTo(25*s,2*s); ctx.stroke();
+
+    // — Ventana grande —
+    const winGrad = ctx.createRadialGradient(-5*s,-22*s,1*s, 0,-20*s,12*s);
+    winGrad.addColorStop(0,'rgba(80,140,220,0.7)'); winGrad.addColorStop(0.6,'rgba(20,60,140,0.5)'); winGrad.addColorStop(1,'rgba(5,15,40,0.4)');
+    ctx.fillStyle='rgba(10,20,40,0.8)';
+    ctx.beginPath(); ctx.roundRect(-11*s,-32*s,22*s,20*s,3*s); ctx.fill();
+    ctx.fillStyle=winGrad;
+    ctx.beginPath(); ctx.roundRect(-10*s,-31*s,20*s,18*s,2.5*s); ctx.fill();
+    // reflejo ventana
+    ctx.fillStyle='rgba(255,255,255,0.18)';
+    ctx.beginPath(); ctx.ellipse(-4*s,-27*s,5*s,2.5*s,-0.4,0,Math.PI*2); ctx.fill();
+    // borde ventana dorado
+    ctx.strokeStyle='#b8860b'; ctx.lineWidth=1.5*s;
+    ctx.beginPath(); ctx.roundRect(-11*s,-32*s,22*s,20*s,3*s); ctx.stroke();
+
+    // — Escalera central —
+    ctx.strokeStyle='#c8a020'; ctx.lineWidth=1.8*s;
+    ctx.beginPath(); ctx.moveTo(-4*s,-10*s); ctx.lineTo(-4*s,16*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(4*s,-10*s); ctx.lineTo(4*s,16*s); ctx.stroke();
+    [-6*s,-1*s,4*s,9*s,14*s].forEach(ry => {
+      ctx.beginPath(); ctx.moveTo(-4*s,ry); ctx.lineTo(4*s,ry); ctx.stroke();
+    });
+
+    // — Base / anillo motor dorado —
+    const ringGrad = ctx.createLinearGradient(-26*s,16*s,26*s,28*s);
+    ringGrad.addColorStop(0,'#5a4000'); ringGrad.addColorStop(0.4,'#d4a020');
+    ringGrad.addColorStop(0.6,'#ffe082'); ringGrad.addColorStop(1,'#5a4000');
+    ctx.fillStyle = ringGrad;
+    ctx.beginPath(); ctx.ellipse(0,22*s,26*s,8*s,0,0,Math.PI*2); ctx.fill();
+    // motor circular central
+    const motorGrad = ctx.createRadialGradient(0,22*s,2*s,0,22*s,12*s);
+    motorGrad.addColorStop(0, ignition>0 ? '#fff7a0' : '#a07010');
+    motorGrad.addColorStop(0.5,'#7a5010'); motorGrad.addColorStop(1,'#3a2800');
+    ctx.fillStyle=motorGrad;
+    ctx.beginPath(); ctx.ellipse(0,22*s,12*s,6*s,0,0,Math.PI*2); ctx.fill();
+
+    // — Patas (4 patas diagonales doradas) —
+    const legData = [
+      { sx:-24*s, sy:16*s, ex:-52*s, ey:52*s },
+      { sx:-18*s, sy:20*s, ex:-30*s, ey:58*s },
+      { sx: 24*s, sy:16*s, ex: 52*s, ey:52*s },
+      { sx: 18*s, sy:20*s, ex: 30*s, ey:58*s },
+    ];
+    legData.forEach(leg => {
+      ctx.strokeStyle='#c8a020'; ctx.lineWidth=3*s; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(leg.sx,leg.sy); ctx.lineTo(leg.ex,leg.ey); ctx.stroke();
+      ctx.strokeStyle='rgba(255,220,80,0.3)'; ctx.lineWidth=1*s;
+      ctx.beginPath(); ctx.moveTo(leg.sx,leg.sy); ctx.lineTo(leg.ex,leg.ey); ctx.stroke();
+      // pie circular (landing pad)
+      const padGrad = ctx.createRadialGradient(leg.ex,leg.ey,1*s,leg.ex,leg.ey,9*s);
+      padGrad.addColorStop(0,'#ffe082'); padGrad.addColorStop(0.5,'#b8860b'); padGrad.addColorStop(1,'#5a4000');
+      ctx.fillStyle=padGrad;
+      ctx.beginPath(); ctx.ellipse(leg.ex,leg.ey,9*s,4*s,0,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle='#ffe082'; ctx.lineWidth=1*s;
+      ctx.beginPath(); ctx.ellipse(leg.ex,leg.ey,9*s,4*s,0,0,Math.PI*2); ctx.stroke();
+    });
+
+    // — Fuego de motores —
+    if (ignition > 0) {
+      const fl = (35 + Math.sin(frameCount*0.9)*12)*s;
+      const fg = ctx.createLinearGradient(0,22*s,0,22*s+fl);
+      fg.addColorStop(0,'rgba(255,240,150,1)');
+      fg.addColorStop(0.3,'#f97316');
+      fg.addColorStop(0.7,'rgba(220,60,20,0.6)');
+      fg.addColorStop(1,'rgba(200,40,10,0)');
+      ctx.globalAlpha = Math.min(ignition * 1.2, 1);
+      ctx.fillStyle = fg;
+      ctx.shadowBlur = 30*s; ctx.shadowColor='rgba(255,160,0,1)';
+      ctx.beginPath();
+      ctx.moveTo(-12*s,20*s);
+      ctx.quadraticCurveTo(-8*s,22*s+fl*0.6,0,22*s+fl);
+      ctx.quadraticCurveTo(8*s,22*s+fl*0.6,12*s,20*s);
+      ctx.closePath(); ctx.fill();
+      // llama interior blanca
+      ctx.fillStyle='rgba(255,255,220,0.7)';
+      ctx.beginPath();
+      ctx.moveTo(-5*s,20*s);
+      ctx.quadraticCurveTo(0,22*s+fl*0.4,5*s,20*s);
+      ctx.closePath(); ctx.fill();
+      ctx.globalAlpha=1; ctx.shadowBlur=0;
+    }
+
+    ctx.shadowBlur=0;
+    ctx.restore();
+  }
+
+  // ── Fase 1 & 2: nave aterriza y Maat aborda ──
+  if (winTimer <= 240) {
+    drawLunarLander(W/2, spaceshipY, 0);
+
+    if (winTimer > 100 && winTimer <= 235) {
+      const t = Math.min((winTimer - 100) / 130, 1);
+      const targetX = W/2 - maat.w/2;
+      const maatBoardX = maat.x + (targetX - maat.x) * t;
+      const maatBoardY = spaceshipY + 30*s;
+      const alpha = winTimer > 220 ? 1 - (winTimer - 220)/15 : 1;
+      const savedX = maat.x, savedY = maat.y, savedAlpha = ctx.globalAlpha;
+      maat.x = maatBoardX;
+      maat.y = maatBoardY;
+      ctx.globalAlpha = alpha;
+      drawMaat();
+      maat.x = savedX; maat.y = savedY; ctx.globalAlpha = savedAlpha;
+    }
+
+  // ── Fase 3 & 4: ignición y despegue ──
+  } else {
+    const ignition = Math.min((winTimer - 240) / 60, 1);
+    drawLunarLander(W/2, spaceshipY, ignition);
+  }
+
+  // ── Texto de victoria ──
+  const shipOffScreen = spaceshipY < -160*S;
+  if (shipOffScreen) {
+    const textAge = winTimer - 380;
+    if (textAge > 0) {
+      const alpha = Math.min(textAge / 40, 1);
+      const pulse = 0.75 + 0.25 * Math.sin(winTimer * 0.15);
+      const bounce = textAge < 20 ? 1 + 0.08 * Math.sin(textAge * 0.5) : 1;
+
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.45;
+      ctx.fillStyle = '#000010';
+      const boxW = Math.min(W * 0.88, 600*S);
+      const boxH = 90*S;
+      ctx.beginPath();
+      ctx.roundRect(W/2 - boxW/2, H/2 - boxH/2 - 20*S, boxW, boxH, 14*S);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.textAlign = 'center';
+      ctx.scale(bounce, bounce);
+      const cx = W / (2 * bounce);
+      const cy = H / (2 * bounce);
+      const fontSize = Math.min(28*S, 52);
+
+      ctx.shadowBlur = 50*S * pulse; ctx.shadowColor = 'rgba(255,200,0,1)';
+      ctx.fillStyle = 'rgba(255,215,0,0.18)';
+      ctx.font = `900 ${fontSize}px 'Orbitron', monospace`;
+      ctx.fillText('MICHI MISIÓN CUMPLIDA', cx, cy - 10*S);
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(0,0,0,0.85)';
+      ctx.fillText('MICHI MISIÓN CUMPLIDA', cx + 3*S, cy - 10*S + 3*S);
+
+      ctx.shadowBlur = 18*S; ctx.shadowColor = '#ffe97a';
+      ctx.fillStyle = '#ffe97a';
+      ctx.fillText('MICHI MISIÓN CUMPLIDA', cx, cy - 10*S);
+
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.2*S;
+      ctx.strokeText('MICHI MISIÓN CUMPLIDA', cx, cy - 10*S);
+
+      ctx.textAlign = 'left';
+      ctx.restore();
+    }
+  }
+
+  ctx.restore();
+}
+
+// ── UI ────────────────────────────────────────────────────
+function updateHUD(lifeGain=false) {
+  document.getElementById('scoreDisplay').textContent = String(score).padStart(3,'0');
+  document.getElementById('levelDisplay').textContent = levelCfg.orbitLabel || `ÓRBITA ${level}`;
+  const hearts = '🐾'.repeat(lives) + '💀'.repeat(Math.max(0,3-lives));
+  document.getElementById('livesDisplay').textContent = hearts;
+}
+
+function showFloat(x,y,text) {
+  const el=document.createElement('div');
+  el.className='float-text'; el.textContent=text;
+  el.style.left=Math.min(Math.max(x-50,8),W-140)+'px';
+  el.style.top=Math.min(Math.max(y-20,8),H-50)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1050);
+}
+
+// ── START / END ──────────────────────────────────────────
+
+function startGame() {
+  initAudio();
+  if (audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+
+  // Fullscreen + landscape SOLO durante el juego
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(()=>{});
+  }
+
+  const miau = document.getElementById('miauSound');
+  if(miau){ miau.load(); }
+  score=0; lives=3; level=1; yarnsThisLevel=0;
+  frameCount=0; levelClearing=false; gameWinning=false; winTimer=0; spaceshipY=0;
+  particles=[]; shootingStars=[];
+  maat={};
+  gameRunning=true;
+  document.body.classList.add('playing');
+  const bgMusicEl = document.getElementById('musicaFondo');
+  if (bgMusicEl) bgMusicEl.volume = 0.08;
+  resize();
+  resetMaatPos();
+  updateHUD();
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('inGameExitBtn').style.display='block';
+  document.getElementById('overlayExitBtn').style.display='none';
+  musicOn=true;
+  document.getElementById('musicBtn').textContent='🔊';
+  playSpaceMusic();
+  loop();
+}
+
+function returnToPortrait() {
+  document.body.classList.remove('playing');
+  if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+  else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  if (screen.orientation && screen.orientation.unlock) {
+    screen.orientation.unlock();
+  }
+}
+
+function endGame() {
+  gameRunning=false;
+  returnToPortrait();
+  document.getElementById('inGameExitBtn').style.display='none';
+  document.getElementById('overlayExitBtn').style.display='block';
+  document.getElementById('overlayTitle').textContent='MISIÓN FALLIDA 💀';
+  document.getElementById('overlaySub').textContent='Maat perdió el equilibrio en las estrellas...\nLa Luna seguirá siendo su presa para el próximo zarpazo.';
+  const sc=document.getElementById('overlayScore');
+  sc.style.display='block';
+  sc.textContent=`🧶 Ovillos: ${score}  ·  ${levelCfg.orbitLabel||'Órbita 1'}`;
+  document.querySelector('.btn-launch').textContent='🚀 NUEVA MISIÓN';
+  document.getElementById('overlay').classList.remove('hidden');
+  stopSpaceMusic();
+  musicOn = false;
+  document.getElementById('musicBtn').textContent = '🔇';
+}
+
+// ── LOOP ─────────────────────────────────────────────────
+function loop() {
+  if (!gameRunning) return;
+  updateGame(); draw();
+  requestAnimationFrame(loop);
+}
+
+// ── HELPERS ──────────────────────────────────────────────
+function roundRect(x,y,w,h,r) {
+  if(w<=0) return;
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath(); ctx.fill();
+}
+
+resize();
+
+function exitGame() {
+  gameRunning = false;
+  returnToPortrait();
+  document.getElementById('inGameExitBtn').style.display='none';
+  document.getElementById('overlayExitBtn').style.display='none';
+
+  const overlay = document.getElementById('overlay');
+  overlay.classList.remove('hidden');
+
+  document.getElementById('overlayTitle').innerHTML = 'MAAT ASTRONAUTA';
+  document.getElementById('overlaySub').innerHTML =
+    '☆ Gata espacial en busca de ovillos ☆<br><br><span style="color:rgba(34,211,238,0.7)">← → mover · ↑ / espacio saltar</span>';
+  document.getElementById('overlayScore').style.display = 'none';
+  document.getElementById('playBtn').innerHTML = '🚀 LANZAR MISIÓN';
+
+  stopSpaceMusic();
+  musicOn = false;
+  document.getElementById('musicBtn').textContent = '🔇';
+}
+
+function toggleMusic(){
+  initAudio();
+  if (audioCtx && audioCtx.state==='suspended') audioCtx.resume().then(() => {
+    _doToggleMusic();
+  });
+  else _doToggleMusic();
+}
+
+function _doToggleMusic(){
+  musicOn = !musicOn;
+  if(musicOn){
+    playSpaceMusic();
+  }else{
+    stopSpaceMusic();
+  }
+  document.getElementById('musicBtn').textContent = musicOn ? '🔊' : '🔇';
+  const floatBtn = document.querySelector('.music-floating');
+  if (floatBtn) floatBtn.textContent = musicOn ? '♫' : '♪';
+}
+</script>
+</body>
+</html>
