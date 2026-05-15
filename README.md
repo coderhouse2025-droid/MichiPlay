@@ -87,7 +87,7 @@ Google Fonts        →  Orbitron (arcade) + Exo 2 (UI)
 
 ```
 MichiPlay/
-├── MichiPlay_fixed.html     ← el juego completo (un solo archivo)
+├── index.html               ← el juego completo (un solo archivo)
 ├── Maat_Astronauta.png      ← imagen hero (portada y Open Graph)
 ├── README.md                ← este archivo
 └── Sonidos/
