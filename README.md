@@ -70,16 +70,29 @@ Al completar los 12 ovillos se activa la cinemática de victoria:
 
 ---
 
-## 🛠️ Tecnologías
-
-```
-HTML5 Canvas API    →  renderizado completo del juego (sin imágenes para sprites)
-Web Audio API       →  efectos de sonido sintetizados en tiempo real
-Screen Orientation  →  bloqueo automático a horizontal en mobile
-CSS Custom Props    →  sistema de temas por nivel (5 paletas)
-Open Graph / OG     →  preview atractivo al compartir el link
-Google Fonts        →  Orbitron (arcade) + Exo 2 (UI)
-```
+## ⚙️ Tecnologías Utilizadas (y por qué)
+🧠 Lenguaje principal
+Python
+Elegido por su ecosistema robusto para análisis de datos y machine learning.
+Permite iterar rápido y construir pipelines reproducibles.
+📊 Análisis y manipulación de datos
+Pandas
+Para limpieza, transformación y estructuración de datos.
+Ideal para trabajar con datasets desordenados (caso realista).
+NumPy
+Optimización de cálculos y operaciones vectorizadas.
+📈 Visualización
+Matplotlib / Seaborn
+Permiten explorar datos y comunicar insights de forma clara.
+Elegidos por su integración directa con Pandas.
+🤖 Machine Learning (si aplica)
+Scikit-learn
+Implementación de modelos predictivos simples.
+Adecuado para prototipos rápidos sin necesidad de infraestructura compleja.
+📓 Entorno de trabajo
+Jupyter Notebook
+Facilita el análisis exploratorio (EDA).
+Permite documentar decisiones paso a paso.
 
 ---
 
