@@ -158,7 +158,10 @@ https://coderhouse2025-droid.github.io/MichiPlay/
 
 Juan Manuel Orellana
 ---
+## 📄 Licencia
 
+Este proyecto está bajo la [Licencia MIT](LICENSE) — libre para uso como referencia, aprendizaje o desarrollo de proyectos propios.
+---
 
                                                          *"Una michi aventura espacial hecha con amor 🐾✨"*
 
